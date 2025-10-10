@@ -1,0 +1,5 @@
+pydicom
+matplotlib
+opencv-python
+numpy
+pytesseract
