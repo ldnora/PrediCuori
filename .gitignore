@@ -1,0 +1,8 @@
+.venv/
+
+TODO
+
+./data/ecg_images/dicom
+./data/ecg_images/*.zip
+
+./src/private_key.key
