@@ -2,7 +2,10 @@
 
 TODO
 
-./data/ecg_images/dicom
-./data/ecg_images/*.zip
+data/ecg_images/dicom/
+data/ecg_images/png/
+data/*.zip
+data/ecg_images/png-anonymazed/mapping.csv
 
-./src/private_key.key
+src/private_key.key
+src/__pycache__/
