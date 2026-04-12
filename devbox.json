@@ -1,0 +1,13 @@
+{
+  "packages": ["python@3.12"],
+  "env": {
+    "VENV_DIR": ".venv"
+  },
+  "shell": {
+    "init_hook": [
+      "[ -d $VENV_DIR ] || python -m venv $VENV_DIR",
+      ". $VENV_DIR/bin/activate",
+      "pip install -r requirements.txt"
+    ]
+  }
+}

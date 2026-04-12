@@ -1,7 +1,8 @@
-pydicom
-matplotlib
-opencv-python
+pandas
 numpy
-pytesseract
-cryptography
-hashlib
+matplotlib
+seaborn
+joblib
+datetime
+scikit-learn
+xgboost

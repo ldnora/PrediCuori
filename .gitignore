@@ -1,11 +1,13 @@
+# Folders
+
 .venv/
+.devbox/
+
+src/
+src/__pycache__/
+
+
+# Files
 
 TODO
-
-data/ecg_images/dicom/
-data/ecg_images/png/
-data/*.zip
-data/ecg_images/png-anonymazed/mapping.csv
-
-src/private_key.key
-src/__pycache__/
+devbox.lock

@@ -1,0 +1,6 @@
+{
+  "code-runner.executorMap": {
+    "python": "devbox run python"
+  }
+  "python.defaultInterpreterPath": ".venv/bin/python"
+}
