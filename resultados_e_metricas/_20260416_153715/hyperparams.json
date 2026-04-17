@@ -1,0 +1,45 @@
+{
+  "Logistic Regression": {
+    "C": 1.943709682639589,
+    "penalty": "l2"
+  },
+  "Random Forest": {
+    "n_estimators": 532,
+    "max_depth": 30,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "max_features": "log2"
+  },
+  "XGBoost": {
+    "n_estimators": 691,
+    "max_depth": 10,
+    "learning_rate": 0.013754368392643398,
+    "subsample": 0.7805907593538831,
+    "colsample_bytree": 0.7118159541746358,
+    "colsample_bylevel": 0.8083939899971984,
+    "colsample_bynode": 0.8675601695146626,
+    "reg_alpha": 0.13921739669930935,
+    "reg_lambda": 0.009631562250142358
+  },
+  "Gradient Boosting": {
+    "n_estimators": 504,
+    "max_depth": 5,
+    "learning_rate": 0.03046094045900087,
+    "subsample": 0.9437444423193279,
+    "min_samples_split": 14,
+    "min_samples_leaf": 3
+  },
+  "SVM": {
+    "C": 4.4681581830483665,
+    "kernel": "rbf",
+    "gamma": "auto"
+  },
+  "MLP": {
+    "n_layers": 2,
+    "units_l0": 235,
+    "units_l1": 32,
+    "activation": "relu",
+    "learning_rate_init": 0.06515795904730018,
+    "alpha": 0.000978909554320823
+  }
+}
