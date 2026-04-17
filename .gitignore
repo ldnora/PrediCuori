@@ -3,11 +3,11 @@
 .venv/
 .devbox/
 
-src/
 src/__pycache__/
+output/
 
 
 # Files
 
-TODO
+TODO*
 devbox.lock
