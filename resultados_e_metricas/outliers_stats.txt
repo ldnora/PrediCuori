@@ -1,0 +1,33 @@
+================================================================================
+RELATORIO DE TRATAMENTO DE OUTLIERS (v1.2)
+================================================================================
+
+Versao: Script v1.2 - Ranges Ajustados para Patologias Reais
+Dataset: 3481 registros
+Data/Hora: 2026-04-17 21:11:45
+
+--------------------------------------------------------------------------------
+Parametro: HR
+  Range ajustado: [25, 300]
+  Outliers encontrados: 43 (1.24%)
+    - Abaixo do minimo: 43 (valor min original: 5.00)
+  Acao: Valores clipados para range [25, 300]
+
+--------------------------------------------------------------------------------
+Parametro: QTC
+  Range ajustado: [250, 700]
+  Outliers encontrados: 42 (1.21%)
+    - Abaixo do minimo: 42 (valor min original: 114.89)
+  Acao: Valores clipados para range [250, 700]
+
+================================================================================
+RESUMO
+================================================================================
+Total de parametros com outliers: 2/14
+Total de valores clipados: 85
+Percentual de valores afetados: 0.17%
+
+Todos os registros foram mantidos (N=3481)
+Metodo aplicado: CLIPPING (valores limitados aos ranges ajustados)
+
+Ranges v1.2 incluem valores patologicos mas biologicamente possiveis
