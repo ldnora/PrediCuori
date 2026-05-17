@@ -6,3 +6,4 @@ joblib
 datetime
 scikit-learn
 xgboost
+pillow
