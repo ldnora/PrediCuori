@@ -1,0 +1,30 @@
+======================================================================
+RELATÓRIO DE INTEGRIDADE DAS IMAGENS ECG
+======================================================================
+Projeto     : PrediCuori
+Autor       : Leandro Dalla Nora
+Instituição : UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação
+Data/Hora   : 17/05/2026 14:12:55
+Script      : script_07_verificar_integridade_imagens.py 
+AUDITORIA FÍSICA
+----------------------------------------
+Arquivos PNG no diretório  : 3,900
+Contagem esperada          : 3,900
+Delta (físico - esperado)  : +0
+Imagens verificadas        : 3,900
+Imagens OK                 : 3,900 (100.00%)
+Corrompidas                : 0
+Resolução incorreta        : 0
+Modo de cor incorreto      : 0
+Brilho insuficiente        : 0
+Contraste insuficiente     : 0
+Arquivos muito grandes     : 0
+
+TAXA DE INTEGRIDADE GERAL  : 100.00%
+TEMPO DE EXECUÇÃO          : 628.1s
+
+COBERTURA TABULAR POR DATASET
+----------------------------------------
+GOLD                : 3,013 registros | Com imagem: 3,013 (100.0%) | Sem imagem:   0
+SILVER_KNN          : 3,481 registros | Com imagem: 3,481 (100.0%) | Sem imagem:   0
+======================================================================
