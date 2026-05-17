@@ -6,6 +6,8 @@
 src/__pycache__/
 output/
 
+image_tracings
+
 
 # Files
 
@@ -13,3 +15,4 @@ TODO*
 devbox.lock
 src/script_06_baseline_tabular_v2_completo.ipynb
 src/teste.py
+src/script_07_verificar_integridade_imagens_v2.py
