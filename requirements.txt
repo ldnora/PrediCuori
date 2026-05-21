@@ -7,3 +7,5 @@ datetime
 scikit-learn
 xgboost
 pillow
+torch
+torchvision
