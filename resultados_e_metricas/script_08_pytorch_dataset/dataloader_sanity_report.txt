@@ -4,7 +4,7 @@
 Projeto     : PrediCuori
 Autor       : Leandro Dalla Nora
 Instituicao : UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação
-Data/Hora   : 27/05/2026 18:10:09
+Data/Hora   : 27/05/2026 20:19:33
 
 CONFIGURACAO DO DATASET
 ----------------------------------------
@@ -29,8 +29,8 @@ Seed            : 42
 RESULTADOS DE SANIDADE
 ----------------------------------------
 Dataset OK             : True
-Train loader (ms/batch): 2.6
-Val   loader (ms/batch): 2.6
+Train loader (ms/batch): 6.0
+Val   loader (ms/batch): 3.8
 Test  loader (ms/batch): -1000.0
 
 ======================================================================
