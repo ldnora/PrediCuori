@@ -4,7 +4,7 @@
 Projeto     : PrediCuori
 Autor       : Leandro Dalla Nora
 Instituicao : UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação
-Data/Hora   : 25/05/2026 18:56:07
+Data/Hora   : 27/05/2026 18:10:09
 
 CONFIGURACAO DO DATASET
 ----------------------------------------
@@ -21,17 +21,16 @@ Num workers     : 4
 SPLITS (base: GOLD, 0% imputacao)
 ----------------------------------------
 Total           : 3,481 registros
-Train (70%)     : 2,436 registros
-Val   (15%)     : 522 registros
-Test  (15%)     : 523 registros
+Train (70%)     : 2,494 registros
+Val   (15%)     : 535 registros
 Gold Test (15%) : 452 registros
 Seed            : 42
 
 RESULTADOS DE SANIDADE
 ----------------------------------------
 Dataset OK             : True
-Train loader (ms/batch): 8.0
-Val   loader (ms/batch): 6.5
-Test  loader (ms/batch): 4.2
+Train loader (ms/batch): 2.6
+Val   loader (ms/batch): 2.6
+Test  loader (ms/batch): -1000.0
 
 ======================================================================
