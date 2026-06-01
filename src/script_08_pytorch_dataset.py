@@ -150,13 +150,15 @@ warnings.filterwarnings('ignore')
 CONFIG = {
     # Paths
     # Dataset SILVER: 3.481 registros, 1,67% imputação com KNN
-    'dataset_file_silver': '../csv/ecg_silver_knn_imputado_classified.csv',
-    # Dataset GOLD para test canônico
-    'dataset_file_gold': '../csv/ecg_gold_completo_classified.csv',
-    'image_dir':    '../image_tracings',
-    'splits_dir':   './splits',
-    'output_dir':   '../resultados_e_metricas/script_08_pytorch_dataset',
-    'plots_dir':    '../resultados_e_metricas/script_08_pytorch_dataset/plots_comparativos',
+    'datasets': {
+        'GOLD': {'file': 'csv/ecg_gold_completo_classified.csv', 'n': 3013, 'imputacao_pct': 0.0,   'metodo': 'Sem imputacao'},
+        'SILVER': {'file': 'csv/ecg_silver_knn_imputado_classified.csv', 'n': 3481, 'imputacao_pct': 1.67,  'metodo': 'KNN'},
+    },
+    'image_dir': 'image_tracings',
+    'splits_dir': 'src/splits/',
+    'results_dir': 'resultados_e_metricas/script_09_modelo_hibrido',
+    'output_dir':   'resultados_e_metricas/script_08_pytorch_dataset',
+    'plots_dir':    'resultados_e_metricas/script_08_pytorch_dataset/plots_comparativos',
 
     # Parâmetros tabulares (14 features)
     'param_cols': [
@@ -178,7 +180,8 @@ CONFIG = {
 
     'train_ratio': 0.70,
     'val_ratio':   0.15,
-    'test_ratio':  0.15,
+    # representa 15% do dataset gold dentro do silver
+    'test_ratio':  0.173249253235977,
     'random_seed': 42,
 
     # DataLoader
@@ -236,8 +239,8 @@ def print_secao(titulo: str):
 
 
 def mapear_gold_para_silver(gold_idx: np.ndarray, config: dict) -> np.ndarray:
-    df_gold = pd.read_csv(config['dataset_file_gold'])
-    df_silver = pd.read_csv(config['dataset_file_silver'])
+    df_gold = pd.read_csv(config['datasets']['GOLD']['file'])
+    df_silver = pd.read_csv(config['datasets']['SILVER']['file'])
     filenames = df_gold.iloc[gold_idx]['filename'].values
     fn_to_idx = {fn: i for i, fn in enumerate(df_silver['filename'].values)}
     return np.array([fn_to_idx[fn] for fn in filenames])
@@ -497,17 +500,11 @@ def get_eval_transform(config: dict) -> transforms.Compose:
 
 
 def criar_dataloaders(train_idx, val_idx, gold_test_idx, scaler, config, mode):
-    csv_file = (
-        config['datasets']['SILVER']['file']
-        if os.path.exists(config['datasets']['SILVER']['file'])
-        else config['dataset_file_silver']
-    )
-
     train_transform = get_train_transform(config)
     eval_transform = get_eval_transform(config)
 
     train_dataset = ECGMultimodalDataset(
-        csv_file=csv_file,
+        csv_file=config['datasets']['SILVER']['file'],
         image_dir=config['image_dir'],
         param_cols=config['param_cols'],
         label_col=config['label_col'],
@@ -518,7 +515,7 @@ def criar_dataloaders(train_idx, val_idx, gold_test_idx, scaler, config, mode):
     )
 
     eval_dataset = ECGMultimodalDataset(
-        csv_file=csv_file,
+        csv_file=config['datasets']['SILVER']['file'],
         image_dir=config['image_dir'],
         param_cols=config['param_cols'],
         label_col=config['label_col'],
@@ -587,7 +584,7 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
 
     if (test_gold):
         dataset_com_transform = ECGMultimodalDataset(
-            csv_file=config['dataset_file_gold'],
+            csv_file=config['datasets']['GOLD']['file'],
             image_dir=config['image_dir'],
             param_cols=config['param_cols'],
             label_col=config['label_col'],
@@ -598,7 +595,7 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
         )
     else:
         dataset_com_transform = ECGMultimodalDataset(
-            csv_file=config['dataset_file_silver'],
+            csv_file=config['datasets']['SILVER']['file'],
             image_dir=config['image_dir'],
             param_cols=config['param_cols'],
             label_col=config['label_col'],
@@ -744,7 +741,7 @@ def gerar_grade_amostras(
     os.makedirs(config['plots_dir'], exist_ok=True)
 
     # Seleciona arquivo CSV conforme flag
-    csv_file = config['dataset_file_gold'] if visualization_gold else config['dataset_file_silver']
+    csv_file = config['datasets']['GOLD']['file'] if visualization_gold else config['datasets']['SILVER']['file']
     dataset_label = 'GOLD' if visualization_gold else 'SILVER'
 
     # Dataset sem scaler para visualização com valores reais
@@ -880,7 +877,7 @@ def exportar_relatorio_sanidade(
         "",
         "CONFIGURACAO DO DATASET",
         "-" * 40,
-        f"Dataset         : {config['dataset_file_silver']}",
+        f"Dataset         : {os.path.exists(config['datasets']['SILVER']['file'])}",
         f"Imagens         : {config['image_dir']}",
         f"N features      : {len(config['param_cols'])}",
         f"Features        : {', '.join(config['param_cols'])}",
@@ -920,36 +917,39 @@ def exportar_relatorio_sanidade(
 # In[ ]:
 
 
-def main():
+def main(config: dict):
     print_separador()
     print(" SCRIPT 08: PYTORCH DATASET E DATALOADERS MULTIMODAIS")
-    print(f"  {CONFIG['institution']}")
-    print(f"  {CONFIG['project']}")
+    print(f"  {config['project']}")
     print(f"  Data   : {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
     print_separador()
 
     # Verificar existência de paths obrigatórios
-    if not os.path.exists(CONFIG['dataset_file_silver']) or not os.path.exists(CONFIG['dataset_file_gold']):
+    if not os.path.exists(config['datasets']['SILVER']['file']) or not os.path.exists(config['datasets']['GOLD']['file']):
         print(
-            f"\n  ERRO: Dataset nao encontrado: {CONFIG['dataset_file_silver']}")
+            f"\n  ERRO: Dataset nao encontrado: {os.path.exists(config['datasets']['SILVER']['file'])}")
         return
-    if not os.path.exists(CONFIG['image_dir']):
+    if not os.path.exists(config['image_dir']):
         print(
-            f"\n  ERRO: Diretorio de imagens nao encontrado: {CONFIG['image_dir']}")
+            f"\n  ERRO: Diretorio de imagens nao encontrado: {config['image_dir']}")
         return
+
+    device = get_device()
+    config = patch_config_for_device(config, device)
+
 
     print_secao("1. CARREGANDO DATASET BASE (SILVER)")
     dataset_base = ECGMultimodalDataset(
-        csv_file=CONFIG['dataset_file_silver'],
-        image_dir=CONFIG['image_dir'],
-        param_cols=CONFIG['param_cols'],
-        label_col=CONFIG['label_col'],
-        filename_col=CONFIG['filename_col'],
+        csv_file=config['datasets']['SILVER']['file'],
+        image_dir=config['image_dir'],
+        param_cols=config['param_cols'],
+        label_col=config['label_col'],
+        filename_col=config['filename_col'],
         transform=None,
         scaler=None,
         mode='hybrid'
     )
-    print(f"  Dataset        : {CONFIG['dataset_file_silver']}")
+    print(f"  Dataset        : {config['datasets']['SILVER']['file']}")
     print(f"  Total registros: {len(dataset_base):,}")
     dist = dataset_base.get_class_distribution()
     total = len(dataset_base)
@@ -957,15 +957,15 @@ def main():
         f"  NORMAL  (0)    : {dist.get(0, 0):,} ({dist.get(0, 0)/total*100:.1f}%)")
     print(
         f"  ANORMAL (1)    : {dist.get(1, 0):,} ({dist.get(1, 0)/total*100:.1f}%)")
-    print(f"  Img resize     : {CONFIG['img_resize'][1]}x{CONFIG['img_resize'][0]} px "
+    print(f"  Img resize     : {config['img_resize'][1]}x{config['img_resize'][0]} px "
           f"(aspect ratio 3385:1793 preservado)")
 
     dataset_gold = ECGMultimodalDataset(
-        csv_file=CONFIG['dataset_file_gold'],
-        image_dir=CONFIG['image_dir'],
-        param_cols=CONFIG['param_cols'],
-        label_col=CONFIG['label_col'],
-        filename_col=CONFIG['filename_col'],
+        csv_file=config['datasets']['GOLD']['file'],
+        image_dir=config['image_dir'],
+        param_cols=config['param_cols'],
+        label_col=config['label_col'],
+        filename_col=config['filename_col'],
         transform=None,
         scaler=None,
         mode='hybrid'
@@ -973,30 +973,31 @@ def main():
 
     print_secao("2. SPLITS ESTRATIFICADOS")
     train_idx, val_idx, gold_test_idx_silver = criar_splits(
-        dataset_base, dataset_gold, CONFIG, force_recalculate=True)
+        dataset_base, dataset_gold, config, force_recalculate=True)
     verificar_distribuicao_splits(
         dataset_base.labels_array, train_idx, val_idx, gold_test_idx_silver
     )
 
     print_secao("3. NORMALIZACAO TABULAR (StandardScaler — fit apenas no TRAIN)")
     scaler = ajustar_scaler(
-        train_idx, CONFIG['dataset_file_silver'], CONFIG['param_cols'])
+        train_idx, config['datasets']['SILVER']['file'], config['param_cols'])
 
     print_secao("4. CRIANDO DATALOADERS")
     train_loader, val_loader, gold_test_loader = criar_dataloaders(
-        dataset_base, train_idx, val_idx, gold_test_idx_silver, scaler, CONFIG
+        train_idx, val_idx, gold_test_idx_silver, scaler, config, 'hybrid'
     )
+
     print(f"  Train loader   : {len(train_loader):,} batches "
-          f"(batch={CONFIG['batch_size']}, drop_last=True)")
+          f"(batch={config['batch_size']}, drop_last=True)")
     print(f"  Val   loader   : {len(val_loader):,} batches")
     print(f"  Gold Test  loader   : {len(gold_test_loader):,} batches")
 
     print_secao("5. TESTES DE SANIDADE")
-    dataset_ok = teste_sanidade_dataset(dataset_base, CONFIG)
-    train_ms = teste_sanidade_dataloader(train_loader, 'TRAIN', CONFIG)
-    val_ms = teste_sanidade_dataloader(val_loader,   'VAL',   CONFIG)
+    dataset_ok = teste_sanidade_dataset(dataset_base, config)
+    train_ms = teste_sanidade_dataloader(train_loader, 'TRAIN', config)
+    val_ms = teste_sanidade_dataloader(val_loader,   'VAL',   config)
     gold_test_ms = teste_sanidade_dataloader(
-        gold_test_loader, 'GOLD_TEST', CONFIG)
+        gold_test_loader, 'GOLD_TEST', config)
     data_leakage = verificar_data_leakage_splits(
         train_idx, val_idx, gold_test_idx_silver)
 
@@ -1008,10 +1009,10 @@ def main():
     }
 
     print_secao("6. EXPORTANDO ARTEFATOS")
-    gerar_grade_amostras(dataset_base, CONFIG)
+    gerar_grade_amostras(dataset_base, config)
     exportar_relatorio_sanidade(
-        resultados, train_idx, val_idx, gold_test_idx_silver, CONFIG)
+        resultados, train_idx, val_idx, gold_test_idx_silver, config)
 
 
 if __name__ == '__main__':
-    main()
+    main(CONFIG)
