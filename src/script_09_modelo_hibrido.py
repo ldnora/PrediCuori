@@ -100,7 +100,6 @@
 
 # In[38]:
 
-
 from script_08_pytorch_dataset import (
     ECGMultimodalDataset,
     get_train_transform,
@@ -108,6 +107,7 @@ from script_08_pytorch_dataset import (
     criar_dataloaders,
     ajustar_scaler,
 )
+from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint
 from sklearn.metrics import (
     roc_auc_score, accuracy_score, f1_score,
     classification_report, roc_curve,
@@ -178,13 +178,13 @@ CONFIG = {
 
     # Treinamento
     'batch_size': 4,  # original  32
-    'num_workers': 4, # 4 a 8 para linux sem gpu
+    'num_workers': 4,  # 4 a 8 para linux sem gpu
     'pin_memory': False,
     'random_seed': 42,
 
     'models_modes': {
-        'densenet121_hybrid'    : 'hybrid',
-        'resnet50_hybrid'       : 'hybrid',
+        'densenet121_hybrid': 'hybrid',
+        'resnet50_hybrid': 'hybrid',
         'efficientnet_b0_hybrid': 'hybrid',
         'cnn_only': 'image',
         'mlp_only': 'tabular',
@@ -440,7 +440,8 @@ def executar_epoca(model, loader, criterion, optimizer, device, treino=True, gra
                 loss.backward()
                 if grad_clip > 0:
                     nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-                optimizer.step()
+
+                optimizer_step(optimizer)
 
             probs = torch.softmax(logits, dim=1)[:, 1]
             preds = logits.argmax(dim=1)
@@ -474,7 +475,12 @@ class EarlyStopping:
         if val_auc > self.best_auc + 1e-5:
             self.best_auc = val_auc
             self.sem_melhoria = 0
-            torch.save(model.state_dict(), self.ckpt_path)
+
+            if TPU_AVAILABLE:
+                xm.save(model.state_dict(), self.ckpt_path)
+            else:
+                torch.save(model.state_dict(), self.ckpt_path)
+
             self.logger.info(f'    Checkpoint salvo (val AUC={val_auc:.4f})')
         else:
             self.sem_melhoria += 1
@@ -793,7 +799,7 @@ def treinar_modelo(model, model_name, train_loader, val_loader, gold_test_loader
         model, model_name, gold_test_loader, device, model_name, logger)
 
     # Serializar modelo final
-    torch.save({
+    save_checkpoint({
         'model_state_dict': model.state_dict(),
         'model_name': model_name,
         'config': {k: v for k, v in config.items() if k != 'datasets'},
@@ -1010,14 +1016,13 @@ def gerar_analise_comparativa(todos_metricas, config, logger):
 
 # In[53]:
 
+def main(config: dict):
+    torch.manual_seed(config['random_seed'])
+    np.random.seed(config['random_seed'])
+    os.makedirs(config['results_dir'], exist_ok=True)
+    os.makedirs(config['checkpoints_dir'], exist_ok=True)
 
-def main():
-    torch.manual_seed(CONFIG['random_seed'])
-    np.random.seed(CONFIG['random_seed'])
-    os.makedirs(CONFIG['results_dir'], exist_ok=True)
-    os.makedirs(CONFIG['checkpoints_dir'], exist_ok=True)
-
-    logger = configurar_logging(CONFIG['results_dir'], 'MAIN')
+    logger = configurar_logging(config['results_dir'], 'MAIN')
     logger.info(
         f'\n{"="*70}\n'
         f'  SCRIPT 09\n'
@@ -1026,29 +1031,27 @@ def main():
         f'{"="*70}'
     )
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = get_device()
+    config = patch_config_for_device(config, device)
+
     logger.info(f'  Device: {device}')
-    if device.type == 'cuda':
-        CONFIG['num_workers'] = 4
-        CONFIG['pin_memory'] = True
-        logger.info(f'  GPU: {torch.cuda.get_device_name(0)}')
 
     todos_metricas = {}
     t_inicio = time.time()
 
-    train_idx, val_idx, gold_test_idx = carregar_splits(CONFIG['splits_dir'])
+    train_idx, val_idx, gold_test_idx = carregar_splits(config['splits_dir'])
 
     scaler = ajustar_scaler(
-        train_idx, CONFIG['datasets']['SILVER']['file'], CONFIG['param_cols'])
+        train_idx, config['datasets']['SILVER']['file'], config['param_cols'])
 
-    y_train = pd.read_csv(CONFIG['datasets']['SILVER']['file'])[
-        CONFIG['label_col']].values[train_idx]
+    y_train = pd.read_csv(config['datasets']['SILVER']['file'])[
+        config['label_col']].values[train_idx]
     weights = compute_class_weight(
         'balanced', classes=np.array([0, 1]), y=y_train)
     criterion = nn.CrossEntropyLoss(weight=torch.tensor(
         weights, dtype=torch.float32).to(device))
 
-    for i, (model_name, mode) in enumerate(CONFIG['models_modes'].items(), 1):
+    for i, (model_name, mode) in enumerate(config['models_modes'].items(), 1):
         logger.info(f'\n{"="*70}')
         logger.info(f'  INICIANDO O {i}º MODELO: {model_name}')
         logger.info(f'{"="*70}')
@@ -1056,17 +1059,17 @@ def main():
         t_ds = time.time()
 
         train_loader, val_loader, gold_test_loader = criar_dataloaders(
-            train_idx, val_idx, gold_test_idx, scaler, CONFIG, mode
+            train_idx, val_idx, gold_test_idx, scaler, config, mode
         )
 
-        model = criar_modelo(model_name=model_name, config=CONFIG)
+        model = criar_modelo(model_name=model_name, config=config)
 
         model.to(device)
 
-        teste_sanidade(model, train_loader, device, CONFIG, logger)
+        teste_sanidade(model, train_loader, device, config, logger)
 
         metricas = treinar_modelo(model, model_name, train_loader,
-                                  val_loader, gold_test_loader, criterion, CONFIG, device, logger)
+                                  val_loader, gold_test_loader, criterion, config, device, logger)
 
         todos_metricas[model_name] = metricas
 
@@ -1075,7 +1078,7 @@ def main():
         logger.info(f'\n{"="*70}')
 
     # Analise comparativa
-    df_comp = gerar_analise_comparativa(todos_metricas, CONFIG, logger)
+    df_comp = gerar_analise_comparativa(todos_metricas, config, logger)
 
     t_total = (time.time() - t_inicio) / 60
     logger.info(f'\n{"="*70}')
@@ -1084,5 +1087,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
+    main(CONFIG)

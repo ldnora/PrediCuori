@@ -2,20 +2,20 @@
 # coding: utf-8
 
 # # Dataset PyTorch e DataLoaders Multimodais
-# 
-# 
+#
+#
 # ## Objetivo e Função no Pipeline
-# 
+#
 # O script_08_pytorch_dataset.ipynb implementa o ECGMultimodalDataset, a classe central que integra imagens e
 # parâmetros tabulares em um único objeto PyTorch Dataset. Além da classe Dataset, o script define os pipelines
 # de transforms (augmentação para treino, normalização para validação/teste), realiza os splits estratificados e valida
 # os DataLoaders com testes de sanidade.
-# 
-# 
+#
+#
 # ## Adaptação para Silver KNN
 # O script_08, em sua versão original, usa o dataset GOLD como base dos splits. Para usar o SILVER KNN, a
 # única alteração necessária é no campo dataset_file do CONFIG:
-# 
+#
 # ```python
 # # Alterar em CONFIG (script_08_pytorch_dataset.ipynb):
 # # VERSÃO ORIGINAL (GOLD — NÃO usar neste roteiro):
@@ -23,76 +23,76 @@
 # # VERSÃO SILVER KNN (usar neste roteiro):
 # 'dataset_file': '../csv/ecg_silver_knn_imputado_classified.csv',
 # ```
-# 
+#
 # <br>
-# 
-# 
+#
+#
 # >   Por que o SILVER KNN como base dos splits?
-# > 
+# >
 # >   Ao usar o SILVER KNN (3.481 registros) como base, o split de treino conterá mais exemplos do que o GOLD (3.013), aproveitando os registros com imputação KNN de baixa intensidade (1,67%). O testset canônico (452 registros do GOLD) é carregado pelo script_09 independentemente — o script_08 não precisa saber do test set do GOLD.
-# 
-# 
-# 
+#
+#
+#
 # ## Splits Estratificados com Silver KNN
-# 
-# 
+#
+#
 # | Split | Proporção | N aprox. | Uso |
 # | :--- | :---: | :---: | :--- |
 # | **Train** | 70% | ~2.437 registros | Treino do modelo + fit do `StandardScaler` |
 # | **Validation** | 15% | ~522 registros | Monitoramento de early stopping e ajuste de LR |
 # | **Test (interno)** | 15% | ~522 registros | Reserva — **NOT** usado no `script_09` desta configuração |
 # | **Test canônico (GOLD)** | — | 452 registros | Avaliação final no `script_09` (carregado de `test_indices.npy`) |
-# 
-# 
+#
+#
 # ## Pipeline de Transforms
 # O pipeline define dois conjuntos de transforms separados para treino e avaliação:
-# 
+#
 # ### Transforms de Treino (com augmentação conservadora)
-# 
+#
 # - Grayscale(1): garante modo L mesmo em exceções de formato
 # - Resize((272, 512)): redimensiona preservando aspect ratio real 3385:1793
 # - RandomAffine: translate=0.02, scale=(0.98, 1.02) — shift ±2% e zoom ±2%
 # - ColorJitter: brightness=0.1, contrast=0.1 — jitter suave de iluminação
 # - ToTensor(): converte para tensor [0, 1]
 # - Normalize(mean=[0.5], std=[0.5]): mapeia para faixa [-1, 1]
-# 
+#
 # >    Restrições de augmentação em ECG:
 # >    Flip horizontal/vertical e rotações aleatórias são PROIBIDOS em ECG. O eixo X representa tempo (morfologia temporal das ondas P, QRS, T) e o eixo Y representa amplitude (derivações fixas). Qualquer transformação geométrica não-sutil invalida o significado clínico da imagem.
-# 
-# 
+#
+#
 # ### Transforms de Avaliação (val/test — sem augmentação)
-# 
+#
 # - Grayscale(1) + Resize((272, 512)) + ToTensor() + Normalize(0.5, 0.5)
 # - Sem augmentação — avaliação determinística e reproduzível
-# 
-# 
-# 
+#
+#
+#
 # ## Normalização Tabular (StandardScaler)
-# 
+#
 # O StandardScaler é ajustado EXCLUSIVAMENTE nos dados de treino (fit apenas no train split) e aplicado por
 # transformação (transform) nos splits de validação e teste. Isso previne data leakage da distribuição de validação
 # para o fit do scaler.
 # As 14 features tabulares normalizadas são: HR, Pd, PR, QRS_Dur, QT, QTC, P_axis, QRS_axis, T_axis, RV5,
 # SV1, RV5_SV1_sum, RV6, SV2.
-# 
-# 
+#
+#
 # ## Execução
-# 
+#
 # Execute célula por célula ou todas de uma única vez.
-# 
-# 
+#
+#
 # ## Testes de Sanidade
-# 
+#
 # O script executa automaticamente 5 testes de sanidade antes de finalizar:
-# 
+#
 # 1. Tamanho do dataset: N total == N registros no CSV filtrado para SILVER_KNN
 # 2. Shape dos tensores de imagem: (1, 272, 512) — canal, altura, largura
 # 3. Range dos pixels pós-normalização: valores próximos ao intervalo [-1, 1]
 # 4. Throughput dos DataLoaders: mede ms/batch em train, val e test loaders
 # 5. Distribuição de classes: verifica balanceamento NORMAL vs. ANORMAL por split
-# 
-# 
-# 
+#
+#
+#
 # ## Artefatos Gerados
 # | Artefato | Local | Conteúdo |
 # | :--- | :--- | :--- |
@@ -101,21 +101,23 @@
 # | `test_indices.npy` | `splits/` | Índices de test interno do SILVER KNN (**NÃO** é o test canônico GOLD) |
 # | `dataloader_sanity_report.txt` | `resultados_e_metricas/` | Relatório de sanidade: splits, shapes, throughput |
 # | `dataset_sample_grid.png` | `plots_comparativos/` | Grade $4 \times 4$ de amostras com label NORMAL/ANORMAL |
-# 
-# 
+#
+#
 # <br>
-# 
+#
 # >    Atenção — test_indices.npy gerado pelo script_08 vs. test canônico GOLD:
 # >    O script_08 gera um test_indices.npy baseado no SILVER KNN. O script_09, porém, carrega o test
 # >    set CANÔNICO do GOLD (452 registros) para avaliação final. Portanto, o test_indices.npy do SILVER
 # >    KNN gerado aqui NÃO é usado diretamente na avaliação do script_09. O script_09 exige que o test
 # >    set canônico do GOLD (gerado anteriormente em uma execução do script_08 com GOLD) esteja
 # >    disponível em splits/test_indices.npy. Veja a primeira seção do script 09
-# 
+#
 
 # In[1]:
 
 
+import matplotlib.pyplot as plt
+from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint
 import os
 import re
 import time
@@ -136,12 +138,11 @@ from sklearn.preprocessing import StandardScaler
 
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 warnings.filterwarnings('ignore')
 
 
-# # Configurações 
+# # Configurações
 
 # In[2]:
 
@@ -159,7 +160,7 @@ CONFIG = {
 
     # Parâmetros tabulares (14 features)
     'param_cols': [
-        'HR', 'Pd', 'PR', 'QRS_Dur', 'QT', 'QTC', 
+        'HR', 'Pd', 'PR', 'QRS_Dur', 'QT', 'QTC',
         'P_axis', 'QRS_axis', 'T_axis',
         'RV5', 'SV1', 'RV5_SV1_sum', 'RV6', 'SV2'
     ],
@@ -170,7 +171,7 @@ CONFIG = {
     # Corpus real: 3385x1793 px (aspect ratio ~1.888:1), modo Gray, 300 DPI.
     # Resize target: 512 largura x 272 altura preserva a proporção original.
     # (512 / 1.888 = 271.2 -> arredondado para 272, múltiplo de 8 para CNNs)
-    'img_resize': (136, 256), # ORIGINAL(272, 512),   # (altura, largura)
+    'img_resize': (136, 256),  # ORIGINAL(272, 512),   # (altura, largura)
     'img_channels': 1,            # grayscale — imagens já chegam em modo L;
                                   # transforms.Grayscale() atua como no-op
                                   # defensivo para garantir consistência
@@ -233,6 +234,7 @@ def print_secao(titulo: str):
     print(f"  {titulo}")
     print_separador()
 
+
 def mapear_gold_para_silver(gold_idx: np.ndarray, config: dict) -> np.ndarray:
     df_gold = pd.read_csv(config['dataset_file_gold'])
     df_silver = pd.read_csv(config['dataset_file_silver'])
@@ -248,15 +250,15 @@ def mapear_gold_para_silver(gold_idx: np.ndarray, config: dict) -> np.ndarray:
 
 class ECGMultimodalDataset(Dataset):
     def __init__(
-        self, 
+        self,
         csv_file: str,
         image_dir: str,
         param_cols: list,
         mode: str,
         label_col: str = 'classificacao',
         filename_col: str = 'filename',
-        transform = None,
-        scaler = None,
+        transform=None,
+        scaler=None,
         return_filename: bool = None,
     ):
         self.df = pd.read_csv(csv_file)
@@ -352,7 +354,8 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
         val_idx = np.load(val_path)
         gold_test_idx = np.load(gold_test_path)
 
-        print(f"\tTrain: {len(train_idx):,} | Val: {len(val_idx):,} | Gold Test: {len(gold_test_idx):,}")
+        print(
+            f"\tTrain: {len(train_idx):,} | Val: {len(val_idx):,} | Gold Test: {len(gold_test_idx):,}")
 
         return train_idx, val_idx, gold_test_idx
 
@@ -367,7 +370,8 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
         random_state=config['random_seed']
     )
 
-    gold_test_idx_silver = mapear_gold_para_silver(gold_idx=gold_test_idx, config=config)
+    gold_test_idx_silver = mapear_gold_para_silver(
+        gold_idx=gold_test_idx, config=config)
 
     mask = np.ones(len(dataset_silver), dtype=bool)
     mask[gold_test_idx_silver] = False
@@ -394,10 +398,13 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
     total_silver = len(dataset_silver)
     total_gold = len(dataset_gold)
 
-    print(f"  Train: {len(train_idx):,} ({len(train_idx)/total_silver*100:.1f}%)")
+    print(
+        f"  Train: {len(train_idx):,} ({len(train_idx)/total_silver*100:.1f}%)")
     print(f"  Val: {len(val_idx):,} ({len(val_idx)/total_silver*100:.1f}%)")
-    print(f"  Test Canônico (proporção do gold): {len(gold_test_idx_silver):,} ({len(gold_test_idx_silver)/total_gold*100:.1f}%)")
-    print(f"  Test Canônico (proporção do gold com silver): {len(gold_test_idx_silver):,} ({len(gold_test_idx_silver)/total_silver*100:.1f}%)")
+    print(
+        f"  Test Canônico (proporção do gold): {len(gold_test_idx_silver):,} ({len(gold_test_idx_silver)/total_gold*100:.1f}%)")
+    print(
+        f"  Test Canônico (proporção do gold com silver): {len(gold_test_idx_silver):,} ({len(gold_test_idx_silver)/total_silver*100:.1f}%)")
     print(f"  Splits salvos em: {config['splits_dir']}/")
 
     return train_idx, val_idx, gold_test_idx_silver
@@ -406,11 +413,12 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
 def verificar_distribuicao_splits(labels: np.ndarray, train_idx: np.ndarray, val_idx: np.ndarray, gold_test_idx: np.ndarray):
     """Imprime distribuição de classes em cada split."""
     print("\n  DISTRIBUICAO DE CLASSES POR SPLIT")
-    print(f"  {'Split':<10} {'Total':>8} {'NORMAL (0)':>14} {'ANORMAL (1)':>14} {'Ratio':>8}")
+    print(
+        f"  {'Split':<10} {'Total':>8} {'NORMAL (0)':>14} {'ANORMAL (1)':>14} {'Ratio':>8}")
     print(f"  {'-'*58}")
 
     for nome, idx in [('Train', train_idx), ('Val', val_idx), ('Gold Test', gold_test_idx)]:
-        y  = labels[idx]
+        y = labels[idx]
         n0 = np.sum(y == 0)
         n1 = np.sum(y == 1)
         ratio = n1 / n0 if n0 > 0 else float('inf')
@@ -467,6 +475,7 @@ def get_train_transform(config: dict) -> transforms.Compose:
         )
     ])
 
+
 def get_eval_transform(config: dict) -> transforms.Compose:
     """
     Aplica normalização (sem augumentation) para o validação
@@ -487,72 +496,63 @@ def get_eval_transform(config: dict) -> transforms.Compose:
 # In[8]:
 
 
-def criar_dataloaders(train_idx: np.ndarray, val_idx: np.ndarray, gold_test_idx: np.ndarray, scaler: StandardScaler, config: dict, mode: str) -> tuple:
-    """
-    Cria os dataloaders para train, test, val do silver e teste canônico do gold
-    - Train: shuffle=True, augmentation ativo, drop_last=True
-    - Val/Test: shuffle=False, transforms determinísticos
-    """
+def criar_dataloaders(train_idx, val_idx, gold_test_idx, scaler, config, mode):
     csv_file = (
         config['datasets']['SILVER']['file']
         if os.path.exists(config['datasets']['SILVER']['file'])
         else config['dataset_file_silver']
     )
+
     train_transform = get_train_transform(config)
     eval_transform = get_eval_transform(config)
 
     train_dataset = ECGMultimodalDataset(
-        csv_file = csv_file,
-        image_dir = config['image_dir'],
-        param_cols = config['param_cols'],
-        label_col = config['label_col'],
-        filename_col = config['filename_col'],
-        transform = train_transform,
-        scaler = scaler,
-        mode = mode
+        csv_file=csv_file,
+        image_dir=config['image_dir'],
+        param_cols=config['param_cols'],
+        label_col=config['label_col'],
+        filename_col=config['filename_col'],
+        transform=train_transform,
+        scaler=scaler,
+        mode=mode
     )
 
     eval_dataset = ECGMultimodalDataset(
-        csv_file = csv_file,
-        image_dir = config['image_dir'],
-        param_cols = config['param_cols'],
-        label_col = config['label_col'],
-        filename_col = config['filename_col'],
-        transform = eval_transform,
-        scaler = scaler,
-        mode = mode
+        csv_file=csv_file,
+        image_dir=config['image_dir'],
+        param_cols=config['param_cols'],
+        label_col=config['label_col'],
+        filename_col=config['filename_col'],
+        transform=eval_transform,
+        scaler=scaler,
+        mode=mode
+    )
+
+    loader_kwargs = dict(
+        batch_size=config['batch_size'],
+        num_workers=config['num_workers'],
+        pin_memory=config['pin_memory'],
+        persistent_workers=config['persistent_workers'],
     )
 
     train_loader = DataLoader(
         Subset(train_dataset, train_idx),
-        batch_size = config['batch_size'],
-        shuffle = True,
-        num_workers = config['num_workers'],
-        pin_memory = config['pin_memory'],
-        drop_last = True,
-        persistent_workers=True
+        shuffle=True,
+        drop_last=True,
+        **loader_kwargs
     )
-
     val_loader = DataLoader(
         Subset(eval_dataset, val_idx),
-        batch_size = config['batch_size'],
-        shuffle = False,
-        num_workers = config['num_workers'],
-        pin_memory = config['pin_memory'],
-        persistent_workers=True
+        shuffle=False,
+        **loader_kwargs
     )
-
     gold_test_loader = DataLoader(
         Subset(eval_dataset, gold_test_idx),
-        batch_size = config['batch_size'],
-        shuffle = False,
-        num_workers = config['num_workers'],
-        pin_memory = config['pin_memory'],
-        persistent_workers=True
+        shuffle=False,
+        **loader_kwargs
     )
 
     print(f"\tDataloaders com imagens redimensionadas")
-
     return train_loader, val_loader, gold_test_loader
 
 
@@ -612,9 +612,9 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
     sample = None
     try:
         sample = dataset_com_transform[0]
-        img_shape   = tuple(sample['image'].shape)
+        img_shape = tuple(sample['image'].shape)
         param_shape = tuple(sample['params'].shape)
-        label_val   = sample['label'].item()
+        label_val = sample['label'].item()
 
         expected_img = (config['img_channels'],) + tuple(config['img_resize'])
         print(f"  [2] Shape imagem (com transform): {img_shape}  "
@@ -625,7 +625,8 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
               f"(esperado: 0 ou 1)")
 
         if img_shape != expected_img:
-            erros.append(f"Shape de imagem incorreto: {img_shape} != {expected_img}")
+            erros.append(
+                f"Shape de imagem incorreto: {img_shape} != {expected_img}")
         if param_shape != (len(config['param_cols']),):
             erros.append(f"Shape de params incorreto: {param_shape}")
         if label_val not in [0, 1]:
@@ -637,9 +638,9 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
     # Teste 3: dtypes
     if sample is not None:
         try:
-            assert sample['image'].dtype  == torch.float32, "Imagem deve ser float32"
+            assert sample['image'].dtype == torch.float32, "Imagem deve ser float32"
             assert sample['params'].dtype == torch.float32, "Params devem ser float32"
-            assert sample['label'].dtype  == torch.long,    "Label deve ser long"
+            assert sample['label'].dtype == torch.long,    "Label deve ser long"
             print(f"  [5] Dtypes                      : "
                   f"float32 / float32 / long  [OK]")
         except AssertionError as e:
@@ -662,12 +663,12 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
             erros.append(f"Erro ao verificar range: {e}")
 
     # Teste 5: distribuição de classes (sobre dataset_base — fonte de verdade)
-    dist  = dataset.get_class_distribution()
+    dist = dataset.get_class_distribution()
     total = sum(dist.values())
     print(
         f"  [7] Distribuicao classes        : "
-        f"NORMAL={dist.get(0,0):,} ({dist.get(0,0)/total*100:.1f}%) | "
-        f"ANORMAL={dist.get(1,0):,} ({dist.get(1,0)/total*100:.1f}%)"
+        f"NORMAL={dist.get(0, 0):,} ({dist.get(0, 0)/total*100:.1f}%) | "
+        f"ANORMAL={dist.get(1, 0):,} ({dist.get(1, 0)/total*100:.1f}%)"
     )
 
     if erros:
@@ -678,6 +679,7 @@ def teste_sanidade_dataset(dataset: ECGMultimodalDataset, config: dict, test_gol
     else:
         print(f"\n  Todos os testes de sanidade passaram.")
         return True
+
 
 def teste_sanidade_dataloader(
     loader: DataLoader, nome: str, config: dict
@@ -694,10 +696,10 @@ def teste_sanidade_dataloader(
         for i, batch in enumerate(loader):
             if i >= n_batches_teste:
                 break
-            inicio  = time.time()
-            img     = batch['image']
-            params  = batch['params']
-            label   = batch['label']
+            inicio = time.time()
+            img = batch['image']
+            params = batch['params']
+            label = batch['label']
             elapsed = time.time() - inicio
             tempos.append(elapsed)
 
@@ -715,16 +717,16 @@ def teste_sanidade_dataloader(
         print(f"  ERRO no DataLoader {nome}: {e}")
         return -1.0
 
+
 def verificar_data_leakage_splits(train_idx: np.ndarray, val_idx: np.ndarray, gold_test_idx_silver: np.ndarray):
     overlap_train = np.intersect1d(train_idx, gold_test_idx_silver)
-    overlap_val   = np.intersect1d(val_idx, gold_test_idx_silver)
+    overlap_val = np.intersect1d(val_idx, gold_test_idx_silver)
     overlap_train_val = np.intersect1d(train_idx, val_idx)
 
-
     print(f"  Sobreposição train/gold_test: {len(overlap_train)} | (Espera-se 0)\n"
-             f"  Sobreposição val/gold_test  : {len(overlap_val)}   | (Espera-se 0)\n"
-             f"  Sobreposição train/val  : {len(overlap_train_val)} | (Espera-se 0)\n"
-             )
+          f"  Sobreposição val/gold_test  : {len(overlap_val)}   | (Espera-se 0)\n"
+          f"  Sobreposição train/val  : {len(overlap_train_val)} | (Espera-se 0)\n"
+          )
 
 
 # # Visualization
@@ -765,15 +767,17 @@ def gerar_grade_amostras(
         labels = dataset_vis.labels_array
 
     # Selecionar amostras balanceadas (N/2 de cada classe)
-    labels      = dataset_vis.labels_array
-    idx_normal  = np.where(labels == 0)[0]
+    labels = dataset_vis.labels_array
+    idx_normal = np.where(labels == 0)[0]
     idx_anormal = np.where(labels == 1)[0]
 
-    n_cada      = n_amostras // 2
-    rng         = np.random.default_rng(config['random_seed'])
-    sel_normal  = rng.choice(idx_normal,  min(n_cada, len(idx_normal)),  replace=False)
-    sel_anormal = rng.choice(idx_anormal, min(n_cada, len(idx_anormal)), replace=False)
-    indices     = np.concatenate([sel_normal, sel_anormal])
+    n_cada = n_amostras // 2
+    rng = np.random.default_rng(config['random_seed'])
+    sel_normal = rng.choice(idx_normal,  min(
+        n_cada, len(idx_normal)),  replace=False)
+    sel_anormal = rng.choice(idx_anormal, min(
+        n_cada, len(idx_anormal)), replace=False)
+    indices = np.concatenate([sel_normal, sel_anormal])
     rng.shuffle(indices)
 
     n_cols = 4
@@ -796,7 +800,8 @@ def gerar_grade_amostras(
         try:
             sample = dataset_vis[int(idx)]
         except Exception as e:
-            print(f"  [AVISO] Falha ao carregar idx={idx}: {type(e).__name__}: {e}")
+            print(
+                f"  [AVISO] Falha ao carregar idx={idx}: {type(e).__name__}: {e}")
             ax.axis('off')
             continue
 
@@ -806,7 +811,8 @@ def gerar_grade_amostras(
         filename = sample.get('filename', f'idx_{idx}')
 
         if img_tensor is None or label_tensor is None:
-            print(f"  [AVISO] Chaves ausentes no sample idx={idx}: {list(sample.keys())}")
+            print(
+                f"  [AVISO] Chaves ausentes no sample idx={idx}: {list(sample.keys())}")
             ax.axis('off')
             continue
 
@@ -817,9 +823,9 @@ def gerar_grade_amostras(
         img_np = img_np * 0.5 + 0.5
         img_np = np.clip(img_np, 0, 1)
 
-        label     = int(label_tensor.item())
+        label = int(label_tensor.item())
         cor_borda = '#2ecc71' if label == 0 else '#e74c3c'
-        classe    = 'NORMAL'  if label == 0 else 'ANORMAL'
+        classe = 'NORMAL' if label == 0 else 'ANORMAL'
 
         ax.imshow(img_np, cmap='gray', aspect='auto')
         ax.set_title(f"{filename}\n{classe}", fontsize=8,
@@ -859,7 +865,8 @@ def exportar_relatorio_sanidade(
 ):
     """Exporta relatório de sanidade em arquivo texto."""
     os.makedirs(config['output_dir'], exist_ok=True)
-    output_path = os.path.join(config['output_dir'], 'dataloader_sanity_report.txt')
+    output_path = os.path.join(
+        config['output_dir'], 'dataloader_sanity_report.txt')
 
     total = len(train_idx) + len(val_idx) + len(gold_test_idx)
     linhas = [
@@ -923,12 +930,13 @@ def main():
 
     # Verificar existência de paths obrigatórios
     if not os.path.exists(CONFIG['dataset_file_silver']) or not os.path.exists(CONFIG['dataset_file_gold']):
-        print(f"\n  ERRO: Dataset nao encontrado: {CONFIG['dataset_file_silver']}")
+        print(
+            f"\n  ERRO: Dataset nao encontrado: {CONFIG['dataset_file_silver']}")
         return
     if not os.path.exists(CONFIG['image_dir']):
-        print(f"\n  ERRO: Diretorio de imagens nao encontrado: {CONFIG['image_dir']}")
+        print(
+            f"\n  ERRO: Diretorio de imagens nao encontrado: {CONFIG['image_dir']}")
         return
-
 
     print_secao("1. CARREGANDO DATASET BASE (SILVER)")
     dataset_base = ECGMultimodalDataset(
@@ -943,10 +951,12 @@ def main():
     )
     print(f"  Dataset        : {CONFIG['dataset_file_silver']}")
     print(f"  Total registros: {len(dataset_base):,}")
-    dist  = dataset_base.get_class_distribution()
+    dist = dataset_base.get_class_distribution()
     total = len(dataset_base)
-    print(f"  NORMAL  (0)    : {dist.get(0,0):,} ({dist.get(0,0)/total*100:.1f}%)")
-    print(f"  ANORMAL (1)    : {dist.get(1,0):,} ({dist.get(1,0)/total*100:.1f}%)")
+    print(
+        f"  NORMAL  (0)    : {dist.get(0, 0):,} ({dist.get(0, 0)/total*100:.1f}%)")
+    print(
+        f"  ANORMAL (1)    : {dist.get(1, 0):,} ({dist.get(1, 0)/total*100:.1f}%)")
     print(f"  Img resize     : {CONFIG['img_resize'][1]}x{CONFIG['img_resize'][0]} px "
           f"(aspect ratio 3385:1793 preservado)")
 
@@ -962,14 +972,15 @@ def main():
     )
 
     print_secao("2. SPLITS ESTRATIFICADOS")
-    train_idx, val_idx, gold_test_idx_silver = criar_splits(dataset_base, dataset_gold, CONFIG, force_recalculate=True)
+    train_idx, val_idx, gold_test_idx_silver = criar_splits(
+        dataset_base, dataset_gold, CONFIG, force_recalculate=True)
     verificar_distribuicao_splits(
         dataset_base.labels_array, train_idx, val_idx, gold_test_idx_silver
     )
 
     print_secao("3. NORMALIZACAO TABULAR (StandardScaler — fit apenas no TRAIN)")
-    scaler = ajustar_scaler(train_idx, CONFIG['dataset_file_silver'], CONFIG['param_cols'])
-
+    scaler = ajustar_scaler(
+        train_idx, CONFIG['dataset_file_silver'], CONFIG['param_cols'])
 
     print_secao("4. CRIANDO DATALOADERS")
     train_loader, val_loader, gold_test_loader = criar_dataloaders(
@@ -980,13 +991,14 @@ def main():
     print(f"  Val   loader   : {len(val_loader):,} batches")
     print(f"  Gold Test  loader   : {len(gold_test_loader):,} batches")
 
-
     print_secao("5. TESTES DE SANIDADE")
     dataset_ok = teste_sanidade_dataset(dataset_base, CONFIG)
     train_ms = teste_sanidade_dataloader(train_loader, 'TRAIN', CONFIG)
     val_ms = teste_sanidade_dataloader(val_loader,   'VAL',   CONFIG)
-    gold_test_ms = teste_sanidade_dataloader(gold_test_loader, 'GOLD_TEST', CONFIG)
-    data_leakage = verificar_data_leakage_splits(train_idx, val_idx, gold_test_idx_silver)
+    gold_test_ms = teste_sanidade_dataloader(
+        gold_test_loader, 'GOLD_TEST', CONFIG)
+    data_leakage = verificar_data_leakage_splits(
+        train_idx, val_idx, gold_test_idx_silver)
 
     resultados = {
         'dataset_ok': dataset_ok,
@@ -997,9 +1009,9 @@ def main():
 
     print_secao("6. EXPORTANDO ARTEFATOS")
     gerar_grade_amostras(dataset_base, CONFIG)
-    exportar_relatorio_sanidade(resultados, train_idx, val_idx, gold_test_idx_silver, CONFIG)
+    exportar_relatorio_sanidade(
+        resultados, train_idx, val_idx, gold_test_idx_silver, CONFIG)
 
 
 if __name__ == '__main__':
     main()
-
