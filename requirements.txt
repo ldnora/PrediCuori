@@ -9,3 +9,6 @@ xgboost
 pillow
 torch
 torchvision
+ipynb
+python-dotenv
+kaggle
