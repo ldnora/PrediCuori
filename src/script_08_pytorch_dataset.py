@@ -825,7 +825,7 @@ def exportar_relatorio_sanidade(
         f"Batch size      : {config['batch_size']}",
         f"Num workers     : {config['num_workers']}",
         "",
-        "SPLITS (base: GOLD, 0% imputacao)",
+        "SPLITS (base: SILVER)",
         "-" * 40,
         f"Total           : {total:,} registros",
         f"Train (70%)     : {len(train_idx):,} registros",
