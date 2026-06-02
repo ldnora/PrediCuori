@@ -118,6 +118,7 @@
 
 import matplotlib.pyplot as plt
 from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint
+from config import build_config_08
 import os
 import re
 import time
@@ -145,70 +146,6 @@ warnings.filterwarnings('ignore')
 # # Configurações
 
 # In[2]:
-
-
-CONFIG = {
-    # Paths
-    # Dataset SILVER: 3.481 registros, 1,67% imputação com KNN
-    'datasets': {
-        'GOLD': {'file': 'csv/ecg_gold_completo_classified.csv', 'n': 3013, 'imputacao_pct': 0.0,   'metodo': 'Sem imputacao'},
-        'SILVER': {'file': 'csv/ecg_silver_knn_imputado_classified.csv', 'n': 3481, 'imputacao_pct': 1.67,  'metodo': 'KNN'},
-    },
-    'image_dir': 'image_tracings',
-    'splits_dir': 'src/splits/',
-    'results_dir': 'resultados_e_metricas/script_09_modelo_hibrido',
-    'output_dir':   'resultados_e_metricas/script_08_pytorch_dataset',
-    'plots_dir':    'resultados_e_metricas/script_08_pytorch_dataset/plots_comparativos',
-
-    # Parâmetros tabulares (14 features)
-    'param_cols': [
-        'HR', 'Pd', 'PR', 'QRS_Dur', 'QT', 'QTC',
-        'P_axis', 'QRS_axis', 'T_axis',
-        'RV5', 'SV1', 'RV5_SV1_sum', 'RV6', 'SV2'
-    ],
-    'label_col':    'classificacao',
-    'filename_col': 'filename',
-
-    # Dimensões das imagens
-    # Corpus real: 3385x1793 px (aspect ratio ~1.888:1), modo Gray, 300 DPI.
-    # Resize target: 512 largura x 272 altura preserva a proporção original.
-    # (512 / 1.888 = 271.2 -> arredondado para 272, múltiplo de 8 para CNNs)
-    'img_resize': (136, 256),  # ORIGINAL(272, 512),   # (altura, largura)
-    'img_channels': 1,            # grayscale — imagens já chegam em modo L;
-                                  # transforms.Grayscale() atua como no-op
-                                  # defensivo para garantir consistência
-
-    'train_ratio': 0.70,
-    'val_ratio':   0.15,
-    # representa 15% do dataset gold dentro do silver
-    'test_ratio':  0.173249253235977,
-    'random_seed': 42,
-
-    # DataLoader
-    'batch_size':  32,
-    'num_workers': 4,      # macOS: manter 0 para evitar problemas de fork
-                           # Linux/GPU: ajustar para 4-8 conforme hardware
-    'pin_memory':  False,  # True apenas com CUDA disponível
-
-    # Data augmentation (treino)
-    # Augmentation conservador: ECG tem orientação temporal (eixo x = tempo)
-    # e espacial (derivações padronizadas) fixas — flip e rotação são proibidos.
-    'aug_translate': 0.02,   # shift máximo de ±2% em x e y
-    'aug_scale_min': 0.98,   # zoom mínimo (98%)
-    'aug_scale_max': 1.02,   # zoom máximo (102%)
-    'aug_brightness': 0.1,   # jitter de brilho ±10%
-    'aug_contrast':   0.1,   # jitter de contraste ±10%
-
-    # Normalização: [0,255] -> [-1, 1] via Normalize(mean=0.5, std=0.5)
-    'normalize_mean': [0.5],
-    'normalize_std':  [0.5],
-
-    # Metadados
-    'author':         'Leandro Dalla Nora',
-    'institution':    'UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação',
-    'project':        'PrediCuori'
-}
-
 
 # # Funções utilitárias
 
@@ -917,7 +854,11 @@ def exportar_relatorio_sanidade(
 # In[ ]:
 
 
-def main(config: dict):
+def main():
+    config = build_config_08()
+    device = get_device()
+    config = patch_config_for_device(config, device)
+
     print_separador()
     print(" SCRIPT 08: PYTORCH DATASET E DATALOADERS MULTIMODAIS")
     print(f"  {config['project']}")
@@ -933,10 +874,6 @@ def main(config: dict):
         print(
             f"\n  ERRO: Diretorio de imagens nao encontrado: {config['image_dir']}")
         return
-
-    device = get_device()
-    config = patch_config_for_device(config, device)
-
 
     print_secao("1. CARREGANDO DATASET BASE (SILVER)")
     dataset_base = ECGMultimodalDataset(
@@ -1015,4 +952,4 @@ def main(config: dict):
 
 
 if __name__ == '__main__':
-    main(CONFIG)
+    main()

@@ -100,6 +100,7 @@
 
 # In[38]:
 
+from config import build_config_09
 from script_08_pytorch_dataset import (
     ECGMultimodalDataset,
     get_train_transform,
@@ -133,85 +134,6 @@ import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
-
-
-CONFIG = {
-    # Paths
-    'image_dir': 'image_tracings',
-    'splits_dir': 'src/splits/',
-    'results_dir': 'resultados_e_metricas/script_09_modelo_hibrido',
-    'checkpoints_dir': 'resultados_e_metricas/script_09_modelo_hibrido/checkpoints',
-
-    'datasets': {
-        'GOLD': {'file': 'csv/ecg_gold_completo_classified.csv', 'n': 3013, 'imputacao_pct': 0.0,   'metodo': 'Sem imputacao'},
-        'SILVER': {'file': 'csv/ecg_silver_knn_imputado_classified.csv', 'n': 3481, 'imputacao_pct': 1.67,  'metodo': 'KNN'},
-    },
-
-    # Colunas
-    'param_cols': [
-        'HR', 'Pd', 'PR', 'QRS_Dur', 'QT', 'QTC',
-        'P_axis', 'QRS_axis', 'T_axis',
-        'RV5', 'SV1', 'RV5_SV1_sum', 'RV6', 'SV2'
-    ],
-    'label_col': 'classificacao',
-    'filename_col': 'filename',
-
-    # Imagem]
-    'img_resize': (136, 256),  # ORIGINAL(272, 512),   # (altura, largura)
-    'img_channels': 1,
-    'normalize_mean': [0.5],
-    'normalize_std': [0.5],
-
-    # Data augmentation
-    'aug_translate': 0.02,
-    'aug_scale_min': 0.98,
-    'aug_scale_max': 1.02,
-    'aug_brightness': 0.1,
-    'aug_contrast': 0.1,
-
-    # Arquitetura
-    'cnn_features': 1024,
-    'mlp_out': 32,
-    'fusion_dim': 1056,
-    'n_classes': 2,
-    'dropout': 0.4,
-
-    # Treinamento
-    'batch_size': 4,  # original  32
-    'num_workers': 4,  # 4 a 8 para linux sem gpu
-    'pin_memory': False,
-    'random_seed': 42,
-
-    'models_modes': {
-        'densenet121_hybrid': 'hybrid',
-        'resnet50_hybrid': 'hybrid',
-        'efficientnet_b0_hybrid': 'hybrid',
-        'cnn_only': 'image',
-        'mlp_only': 'tabular',
-    },
-
-    'modes': ['hybrid', 'image', 'tabular'],
-
-    # Fase 1 — Warm-up (CNN congelada)
-    'warmup_epochs': 1,  # original 10
-    'warmup_lr': 1e-3,
-
-    # Fase 2 — Fine-tuning (rede completa, LRs diferenciados)
-    'finetune_epochs': 1,  # original 40
-    'lr_cnn': 1e-5,
-    'lr_mlp': 1e-4,
-    'lr_fusion': 1e-4,
-
-    # Regularizacao e controle
-    'weight_decay': 1e-4,
-    'lr_patience': 5,
-    'lr_factor': 0.5,
-    'early_stop_patience': 10,
-    'grad_clip': 1.0,
-
-    # Limiar H0: Delta AUC-ROC < 2% => robusto
-    'delta_threshold': 0.02,
-}
 
 
 # # Configure logging
@@ -1016,7 +938,11 @@ def gerar_analise_comparativa(todos_metricas, config, logger):
 
 # In[53]:
 
-def main(config: dict):
+def main():
+    config = build_config_09()
+    device = get_device()
+    config = patch_config_for_device(config, device)
+
     torch.manual_seed(config['random_seed'])
     np.random.seed(config['random_seed'])
     os.makedirs(config['results_dir'], exist_ok=True)
@@ -1030,9 +956,6 @@ def main(config: dict):
         f'  {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
         f'{"="*70}'
     )
-
-    device = get_device()
-    config = patch_config_for_device(config, device)
 
     logger.info(f'  Device: {device}')
 
@@ -1087,4 +1010,4 @@ def main(config: dict):
 
 
 if __name__ == '__main__':
-    main(CONFIG)
+    main()
