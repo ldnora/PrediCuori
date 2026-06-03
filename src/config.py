@@ -12,35 +12,22 @@ load_dotenv(Path(__file__).parent.parent / '.env')
 
 def setup_environment() -> dict:
     if os.path.exists('/kaggle/input'):
-        from kaggle_secrets import UserSecretsClient
-        secrets = UserSecretsClient()
-        token = secrets.get_secret("GITHUB_TOKEN")
-        repo = secrets.get_secret("GITHUB_REPO")
-
-        subprocess.run([
-            'git', 'clone', '--quiet', '--depth', '1',
-            f'https://{token}@{repo}',
-            '/kaggle/working/repo'
-        ], check=True)
-
-        subprocess.run([
-            'pip', 'install', '-q', '-r',
-            '/kaggle/working/repo/requirements.txt'
-        ], check=True)
-
-        sys.path.insert(0, '/kaggle/working/repo/src')
         logger.info('Ambiente: Kaggle')
-
-        dataset_csv = os.getenv('KAGGLE_DATASET_CSV').split('/')[-1]
-        dataset_imgs = os.getenv('KAGGLE_DATASET_IMGS').split('/')[-1]
-
         return {
-            'image_dir': f'/kaggle/input/{dataset_imgs}/',
+            'csv_dir':    '/kaggle/input/ecg-csv/csv/',
             'splits_dir': '/kaggle/working/repo/src/splits/',
-            'base_output': '/kaggle/working/',
-            'csv_gold': f'/kaggle/input/{dataset_csv}/ecg_gold_completo_classified.csv',
-            'csv_silver': f'/kaggle/input/{dataset_csv}/ecg_silver_knn_imputado_classified.csv',
+            'image_dir':  '/kaggle/input/ecg-imagens/',
+            'output_dir': '/kaggle/working/',
         }
+
+    ROOT = Path(__file__).parent.parent
+    return {
+        'csv_dir':    os.getenv('LOCAL_CSV_DIR',    str(ROOT / 'data' / 'csv')),
+        'splits_dir': str(ROOT / 'src' / 'splits'),
+        'image_dir':  os.getenv('LOCAL_IMAGE_DIR',  str(ROOT / 'data' / 'imagens')),
+        'output_dir': os.getenv('LOCAL_OUTPUT_DIR', str(ROOT / 'resultados_e_metricas')),
+    }
+
 
     ROOT = Path(__file__).parent.parent
     logger.info('Ambiente: Local')
