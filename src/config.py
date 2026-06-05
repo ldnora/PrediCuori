@@ -15,13 +15,14 @@ def setup_environment() -> dict:
 
     if os.path.exists('/kaggle/input'):
         logger.info('Ambiente: Kaggle')
-        csv_dir = '/kaggle/input/ecg-csv/csv/'
+        csv_dir = str('/kaggle/input/datasets/', os.getenv('KAGGLE_DATASET_CSV')),
+        image_dir = str('/kaggle/input/datasets/', os.getenv('KAGGLE_DATASET_IMGS'), 'image_tracings')
         return {
-            'image_dir':   '/kaggle/input/ecg-imagens/',
-            'splits_dir':  '/kaggle/working/repo/src/splits/',
-            'output_dir':  '/kaggle/working/',
-            'csv_gold':    os.path.join(csv_dir, 'ecg_gold_completo_classified.csv'),
-            'csv_silver':  os.path.join(csv_dir, 'ecg_silver_knn_imputado_classified.csv'),
+            'image_dir':  image_dir,
+            'splits_dir': '/kaggle/working/repo/src/splits/',
+            'output_dir': '/kaggle/working/',
+            'csv_gold':   os.path.join(csv_dir, 'ecg_gold_completo_classified.csv'),
+            'csv_silver': os.path.join(csv_dir, 'ecg_silver_knn_imputado_classified.csv'),
         }
 
     logger.info('Ambiente: Local')
@@ -51,7 +52,7 @@ SHARED = {
     ],
     'label_col': 'classificacao',
     'filename_col': 'filename',
-    'img_resize': (136, 256),
+    'img_resize': (272, 512),
     'img_channels': 1,
     'normalize_mean': [0.5],
     'normalize_std': [0.5],
@@ -68,6 +69,7 @@ SHARED = {
     'institution': 'UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação',
     'project': 'PrediCuori',
 }
+
 
 def build_config_08() -> dict:
     return {

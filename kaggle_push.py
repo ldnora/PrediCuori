@@ -53,8 +53,6 @@ notebook = {
                 "\n",
                 "sys.path.insert(0, f'{repo_path}/src')\n",
                 "\n",
-                "sys.path.insert(0, f'{repo_path}/src')\n",
-                "\n",
                 "from script_09_modelo_hibrido import main\n",
                 "main()\n",
             ]
