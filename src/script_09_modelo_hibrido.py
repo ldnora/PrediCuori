@@ -990,6 +990,20 @@ def gerar_analise_comparativa(todos_metricas, config, logger):
     return df_comp
 
 
+def substituir_bn(module):
+    for name, child in module.named_children():
+        if isinstance(child, nn.BatchNorm2d):
+            num_channels = child.num_features
+            setattr(module, name, nn.GroupNorm(
+                num_groups=min(32, num_channels),
+                num_channels=num_channels
+            ))
+        else:
+            substituir_bn(child)
+
+
+
+
 # In[53]:
 
 def main():
@@ -1040,10 +1054,7 @@ def main():
 
         model = criar_modelo(model_name=model_name, config=config)
 
-
-        if TPU_AVAILABLE:
-            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)  # ← tenta primeiro
-        
+        substituir_bn(model)
         model.to(device)
 
         teste_sanidade(model, train_loader, device, config, logger)
