@@ -21,12 +21,17 @@ def get_device():
 
 def patch_config_for_device(config: dict, device) -> dict:
     device_str = str(device)
-
+    
     if TPU_AVAILABLE:
         config['pin_memory'] = False
         config['num_workers'] = 4
         config['persistent_workers'] = False
-        logger.info(f'  TPU cores: {xm.xrt_world_size()}')
+        try:
+            import torch_xla
+            num_devices = torch_xla.runtime.global_device_count()
+        except Exception:
+            num_devices = '?'
+        logger.info(f'  TPU cores: {num_devices}')
 
     elif 'cuda' in device_str:
         config['pin_memory'] = True

@@ -351,7 +351,7 @@ class CNNOnlyClassifier(nn.Module):
 
 def executar_epoca(model, loader, criterion, optimizer, device, treino=True, grad_clip=1.0):
     model.train() if treino else model.eval()
-    total_loss, labels_l, probs_l, preds_l, n = 0.0, [], [], [], 0
+    total_loss, labels_l, probs_l, preds_l = 0.0, [], [], []
     loader = wrap_dataloader(loader, device)
 
     ctx = torch.enable_grad() if treino else torch.no_grad()
@@ -365,29 +365,34 @@ def executar_epoca(model, loader, criterion, optimizer, device, treino=True, gra
 
             if treino:
                 optimizer.zero_grad(set_to_none=True)
+
             logits = model(imgs, params)
             loss = criterion(logits, labels)
+
             if treino:
                 loss.backward()
                 if grad_clip > 0:
                     nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-
                 optimizer_step(optimizer)
 
             probs = torch.softmax(logits, dim=1)[:, 1]
             preds = logits.argmax(dim=1)
-            total_loss += loss.item()
-            labels_l.append(labels.cpu().numpy())
-            probs_l.append(probs.detach().cpu().numpy())
-            preds_l.append(preds.cpu().numpy())
-            n += 1
 
-    y, p, yp = (np.concatenate(x) for x in [labels_l, probs_l, preds_l])
+            total_loss += loss.detach()
+            labels_l.append(labels.detach())
+            probs_l.append(probs.detach())
+            preds_l.append(preds.detach())
+
+    labels_np = torch.cat(labels_l).cpu().numpy()
+    probs_np = torch.cat(probs_l).cpu().numpy()
+    preds_np = torch.cat(preds_l).cpu().numpy()
+    loss_val = total_loss.item() / max(len(labels_l), 1)
+
     return {
-        'loss': total_loss / max(n, 1),
-        'accuracy': float(accuracy_score(y, yp)),
-        'auc_roc': float(roc_auc_score(y, p)),
-        'f1': float(f1_score(y, yp, average='macro', zero_division=0)),
+        'loss':     loss_val,
+        'accuracy': float(accuracy_score(labels_np, preds_np)),
+        'auc_roc':  float(roc_auc_score(labels_np, probs_np)),
+        'f1':       float(f1_score(labels_np, preds_np, average='macro', zero_division=0)),
     }
 
 
@@ -454,8 +459,9 @@ def fase_warmup(model, train_loader, val_loader, criterion, config, device, ckpt
         if es(vl['auc_roc'], model):
             break
 
-    model.load_state_dict(torch.load(os.path.join(
-        ckpt_dir, 'best_warmup.pt'), weights_only=True))
+    ckpt_path = os.path.join(ckpt_dir, 'best_warmup.pt')
+    state_dict = torch.load(ckpt_path, map_location=device, weights_only=True)
+    model.load_state_dict(state_dict)
     logger.info(f'  Melhor val AUC-ROC (fase 1): {es.best_auc:.4f}')
 
     return hist
@@ -507,8 +513,9 @@ def fase_finetuning(model, train_loader, val_loader, criterion, config, device, 
         if es(vl['auc_roc'], model):
             break
 
-    model.load_state_dict(torch.load(
-        os.path.join(ckpt_dir, 'best_finetune.pt'), weights_only=True))
+    ckpt_path = os.path.join(ckpt_dir, 'best_finetune.pt')
+    state_dict = torch.load(ckpt_path, map_location=device, weights_only=True)
+    model.load_state_dict(state_dict)
     logger.info(f'  Melhor val AUC-ROC (fase 2): {es.best_auc:.4f}')
 
     return hist
@@ -548,9 +555,10 @@ def fase_treinamento_mlp(model, train_loader, val_loader, criterion, config, dev
         if es(vl['auc_roc'], model):
             break
 
-    model.load_state_dict(torch.load(
-        os.path.join(ckpt_dir, 'best_finetune.pt'), weights_only=True))
-    logger.info(f'  Melhor val AUC-ROC (fase 2): {es.best_auc:.4f}')
+    ckpt_path = os.path.join(ckpt_dir, 'best_finetune.pt')
+    state_dict = torch.load(ckpt_path, map_location=device, weights_only=True)
+    model.load_state_dict(state_dict)
+    logger.info(f'  Melhor val AUC-ROC (fase MLP): {es.best_auc:.4f}')
 
     return hist
 
