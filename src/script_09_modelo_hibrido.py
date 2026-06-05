@@ -108,7 +108,7 @@ from script_08_pytorch_dataset import (
     criar_dataloaders,
     ajustar_scaler,
 )
-from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint
+from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint, TPU_AVAILABLE
 from sklearn.metrics import (
     roc_auc_score, accuracy_score, f1_score,
     classification_report, roc_curve,
@@ -397,12 +397,7 @@ class EarlyStopping:
         if val_auc > self.best_auc + 1e-5:
             self.best_auc = val_auc
             self.sem_melhoria = 0
-
-            if TPU_AVAILABLE:
-                xm.save(model.state_dict(), self.ckpt_path)
-            else:
-                torch.save(model.state_dict(), self.ckpt_path)
-
+            save_checkpoint(model.state_dict(), self.ckpt_path)
             self.logger.info(f'    Checkpoint salvo (val AUC={val_auc:.4f})')
         else:
             self.sem_melhoria += 1
