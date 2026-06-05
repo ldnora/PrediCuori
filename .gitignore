@@ -16,3 +16,6 @@ TODO*
 devbox.lock
 src/teste.py
 .env
+kaggle_test.py
+kernel.ipynb
+kernel-metadata.json

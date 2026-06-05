@@ -11,38 +11,31 @@ load_dotenv(Path(__file__).parent.parent / '.env')
 
 
 def setup_environment() -> dict:
+    ROOT = Path(__file__).parent.parent
+
     if os.path.exists('/kaggle/input'):
         logger.info('Ambiente: Kaggle')
+        csv_dir = '/kaggle/input/ecg-csv/csv/'
         return {
-            'csv_dir':    '/kaggle/input/ecg-csv/csv/',
-            'splits_dir': '/kaggle/working/repo/src/splits/',
-            'image_dir':  '/kaggle/input/ecg-imagens/',
-            'output_dir': '/kaggle/working/',
+            'image_dir':   '/kaggle/input/ecg-imagens/',
+            'splits_dir':  '/kaggle/working/repo/src/splits/',
+            'output_dir':  '/kaggle/working/',
+            'csv_gold':    os.path.join(csv_dir, 'ecg_gold_completo_classified.csv'),
+            'csv_silver':  os.path.join(csv_dir, 'ecg_silver_knn_imputado_classified.csv'),
         }
 
-    ROOT = Path(__file__).parent.parent
-    return {
-        'csv_dir':    os.getenv('LOCAL_CSV_DIR',    str(ROOT / 'data' / 'csv')),
-        'splits_dir': str(ROOT / 'src' / 'splits'),
-        'image_dir':  os.getenv('LOCAL_IMAGE_DIR',  str(ROOT / 'data' / 'imagens')),
-        'output_dir': os.getenv('LOCAL_OUTPUT_DIR', str(ROOT / 'resultados_e_metricas')),
-    }
-
-
-    ROOT = Path(__file__).parent.parent
     logger.info('Ambiente: Local')
-
+    csv_dir = ROOT / 'data' / 'csv'
     return {
-        'image_dir': str(ROOT / os.getenv('LOCAL_IMAGE_DIR', 'image_tracings')),
-        'splits_dir': str(ROOT / 'src' / 'splits'),
-        'base_output str': (ROOT / os.getenv('LOCAL_OUTPUT_DIR', 'resultados_e_metricas')),
-        'csv_gold': str(ROOT / 'data' / 'csv' / 'ecg_gold_completo_classified.csv'),
-        'csv_silver': str(ROOT / 'data' / 'csv' / 'ecg_silver_knn_imputado_classified.csv'),
+        'image_dir':   str(ROOT / os.getenv('LOCAL_IMAGE_DIR', 'image_tracings')),
+        'splits_dir':  str(ROOT / 'src' / 'splits'),
+        'output_dir':  str(ROOT / os.getenv('LOCAL_OUTPUT_DIR', 'resultados_e_metricas')),
+        'csv_gold':    str(csv_dir / 'ecg_gold_completo_classified.csv'),
+        'csv_silver':  str(csv_dir / 'ecg_silver_knn_imputado_classified.csv'),
     }
 
 
 _PATHS = setup_environment()
-
 
 SHARED = {
     'datasets': {
@@ -76,12 +69,11 @@ SHARED = {
     'project': 'PrediCuori',
 }
 
-
 def build_config_08() -> dict:
     return {
         **SHARED,
-        'output_dir': os.path.join(_PATHS['base_output'], 'script_08_pytorch_dataset'),
-        'plots_dir': os.path.join(_PATHS['base_output'], 'script_08_pytorch_dataset', 'plots_comparativos'),
+        'output_dir': os.path.join(_PATHS['output_dir'], 'script_08_pytorch_dataset'),
+        'plots_dir': os.path.join(_PATHS['output_dir'], 'script_08_pytorch_dataset', 'plots_comparativos'),
         'batch_size': 32,
         'num_workers': 4,
         'pin_memory': False,
@@ -92,8 +84,8 @@ def build_config_08() -> dict:
 def build_config_09() -> dict:
     return {
         **SHARED,
-        'results_dir': os.path.join(_PATHS['base_output'], 'script_09_modelo_hibrido'),
-        'checkpoints_dir': os.path.join(_PATHS['base_output'], 'script_09_modelo_hibrido', 'checkpoints'),
+        'results_dir': os.path.join(_PATHS['output_dir'], 'script_09_modelo_hibrido'),
+        'checkpoints_dir': os.path.join(_PATHS['output_dir'], 'script_09_modelo_hibrido', 'checkpoints'),
         'cnn_features': 1024,
         'mlp_out': 32,
         'fusion_dim': 1056,
