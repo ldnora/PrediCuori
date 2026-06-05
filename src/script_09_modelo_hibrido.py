@@ -1040,6 +1040,10 @@ def main():
 
         model = criar_modelo(model_name=model_name, config=config)
 
+
+        if TPU_AVAILABLE:
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)  # ← tenta primeiro
+        
         model.to(device)
 
         teste_sanidade(model, train_loader, device, config, logger)
