@@ -15,9 +15,8 @@ def setup_environment() -> dict:
 
     if os.path.exists('/kaggle/input'):
         logger.info('Ambiente: Kaggle')
-        csv_dir = os.path.join('/kaggle/input/datasets', os.getenv('KAGGLE_DATASET_CSV'))
-        image_dir = os.path.join('/kaggle/input/datasets', os.getenv('KAGGLE_DATASET_IMGS'), 'image_tracings')
-
+        csv_dir = '/kaggle/input/datasets/ldnora/predicuori-ecg-csv'
+        image_dir = '/kaggle/input/datasets/ldnora/predicuori-image-tracings/image_tracings'
         return {
             'image_dir':  image_dir,
             'splits_dir': '/kaggle/working/repo/src/splits/',
@@ -29,11 +28,11 @@ def setup_environment() -> dict:
     logger.info('Ambiente: Local')
     csv_dir = ROOT / 'data' / 'csv'
     return {
-        'image_dir':   str(ROOT / os.getenv('LOCAL_IMAGE_DIR', 'image_tracings')),
-        'splits_dir':  str(ROOT / 'src' / 'splits'),
-        'output_dir':  str(ROOT / os.getenv('LOCAL_OUTPUT_DIR', 'resultados_e_metricas')),
-        'csv_gold':    str(csv_dir / 'ecg_gold_completo_classified.csv'),
-        'csv_silver':  str(csv_dir / 'ecg_silver_knn_imputado_classified.csv'),
+        'image_dir':  str(ROOT / os.getenv('LOCAL_IMAGE_DIR', 'image_tracings')),
+        'splits_dir': str(ROOT / 'src' / 'splits'),
+        'output_dir': str(ROOT / os.getenv('LOCAL_OUTPUT_DIR', 'resultados_e_metricas')),
+        'csv_gold':   str(csv_dir / 'ecg_gold_completo_classified.csv'),
+        'csv_silver': str(csv_dir / 'ecg_silver_knn_imputado_classified.csv'),
     }
 
 
