@@ -349,7 +349,7 @@ class CNNOnlyClassifier(nn.Module):
 # In[44]:
 
 
-def executar_epoca(model, loader, criterion, optimizer, device, treino=True, grad_clip=1.0, , logger):
+def executar_epoca(model, loader, criterion, optimizer, device, logger, treino=True, grad_clip=1.0):
     model.train() if treino else model.eval()
     total_loss, labels_l, probs_l, preds_l = 0.0, [], [], []
     loader = wrap_dataloader(loader, device)
@@ -457,9 +457,12 @@ def fase_warmup(model, train_loader, val_loader, criterion, config, device, ckpt
     hist = []
     for ep in range(1, config['warmup_epochs'] + 1):
         t0 = time.time()
-        tr = executar_epoca(model, train_loader, criterion,
-                            opt, device, True, config['grad_clip'], logger)
-        vl = executar_epoca(model, val_loader, criterion, opt, device, False)
+        tr = executar_epoca(model=model, loader=train_loader, criterion=criterion,
+                            optimizer=opt, device=device, logger=logger, treino=True,  grad_clip=config['grad_clip'])
+        vl = executar_epoca(model=model, loader=val_loader, criterion=criterion, optimizer=opt,
+                            device=device, logger=logger, treino=False, grad_clip=config['grad_clip'])
+
+        
         dt = time.time() - t0
         sched.step(vl['auc_roc'])
         logger.info(f'  E{ep:02d}/{config["warmup_epochs"]:02d} '
@@ -511,9 +514,11 @@ def fase_finetuning(model, train_loader, val_loader, criterion, config, device, 
     hist = []
     for ep in range(1, config['finetune_epochs'] + 1):
         t0 = time.time()
-        tr = executar_epoca(model, train_loader, criterion,
-                            opt, device, True,  config['grad_clip'])
-        vl = executar_epoca(model, val_loader,   criterion, opt, device, False)
+        tr = executar_epoca(model=model, loader=train_loader, criterion=criterion,
+                            optimizer=opt, device=device, logger=logger, treino=True,  grad_clip=config['grad_clip'])
+        vl = executar_epoca(model=model, loader=val_loader, criterion=criterion, optimizer=opt,
+                            device=device, logger=logger, treino=False, grad_clip=config['grad_clip'])
+
         dt = time.time() - t0
         sched.step(vl['auc_roc'])
         logger.info(f'  E{ep:02d}/{config["finetune_epochs"]:02d} '
@@ -553,9 +558,11 @@ def fase_treinamento_mlp(model, train_loader, val_loader, criterion, config, dev
 
     for ep in range(1, config['finetune_epochs'] + 1):
         t0 = time.time()
-        tr = executar_epoca(model, train_loader, criterion,
-                            opt, device, True,  config['grad_clip'])
-        vl = executar_epoca(model, val_loader, criterion, opt, device, False)
+        tr = executar_epoca(model=model, loader=train_loader, criterion=criterion,
+                            optimizer=opt, device=device, logger=logger, treino=True,  grad_clip=config['grad_clip'])
+        vl = executar_epoca(model=model, loader=val_loader, criterion=criterion, optimizer=opt,
+                            device=device, logger=logger, treino=False, grad_clip=config['grad_clip'])
+
         dt = time.time() - t0
         sched.step(vl['auc_roc'])
         logger.info(f'  E{ep:02d}/{config["finetune_epochs"]:02d} '
