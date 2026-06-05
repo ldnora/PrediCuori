@@ -357,17 +357,30 @@ def executar_epoca(model, loader, criterion, optimizer, device, logger, treino=T
     ctx = torch.enable_grad() if treino else torch.no_grad()
     with ctx:
         for batch in loader:
-            imgs = batch['image'].to(
-                device, non_blocking=True) if 'image' in batch else None
-            params = batch['params'].to(
-                device, non_blocking=True) if 'params' in batch else None
+            imgs = batch['image'].to(device, non_blocking=True) if 'image' in batch else None
+            params = batch['params'].to(device, non_blocking=True) if 'params' in batch else None
             labels = batch['label'].to(device, non_blocking=True)
+
+            if logger:
+                if imgs is not None and torch.isnan(imgs).any():
+                    logger.warning('NaN em imgs')
+                if params is not None and torch.isnan(params).any():
+                    logger.warning('NaN em params')
+                if torch.isnan(labels.float()).any():
+                    logger.warning('NaN em labels')
+
 
             if treino:
                 optimizer.zero_grad(set_to_none=True)
 
             logits = model(imgs, params)
             loss = criterion(logits, labels)
+
+            if logger and torch.isnan(logits).any():
+                logger.warning(f'NaN em logits — min={imgs.min():.3f} max={imgs.max():.3f}')
+
+            if logger and torch.isnan(loss):
+                logger.warning('NaN na loss')
 
             if treino:
                 loss.backward()
