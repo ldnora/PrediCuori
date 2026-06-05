@@ -15,8 +15,9 @@ def setup_environment() -> dict:
 
     if os.path.exists('/kaggle/input'):
         logger.info('Ambiente: Kaggle')
-        csv_dir = str('/kaggle/input/datasets/', os.getenv('KAGGLE_DATASET_CSV')),
-        image_dir = str('/kaggle/input/datasets/', os.getenv('KAGGLE_DATASET_IMGS'), 'image_tracings')
+        csv_dir = os.path.join('/kaggle/input/datasets', os.getenv('KAGGLE_DATASET_CSV'))
+        image_dir = os.path.join('/kaggle/input/datasets', os.getenv('KAGGLE_DATASET_IMGS'), 'image_tracings')
+
         return {
             'image_dir':  image_dir,
             'splits_dir': '/kaggle/working/repo/src/splits/',
