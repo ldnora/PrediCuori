@@ -100,6 +100,13 @@
 
 # In[38]:
 
+from device_utils import (get_device,
+                          patch_config_for_device,
+                          optimizer_step,
+                          save_checkpoint,
+                          TPU_AVAILABLE,
+                          wrap_dataloader
+)
 from config import build_config_09
 from script_08_pytorch_dataset import (
     ECGMultimodalDataset,
@@ -108,7 +115,8 @@ from script_08_pytorch_dataset import (
     criar_dataloaders,
     ajustar_scaler,
 )
-from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint, TPU_AVAILABLE
+
+
 from sklearn.metrics import (
     roc_auc_score, accuracy_score, f1_score,
     classification_report, roc_curve,
@@ -344,6 +352,7 @@ class CNNOnlyClassifier(nn.Module):
 def executar_epoca(model, loader, criterion, optimizer, device, treino=True, grad_clip=1.0):
     model.train() if treino else model.eval()
     total_loss, labels_l, probs_l, preds_l, n = 0.0, [], [], [], 0
+    loader = wrap_dataloader(loader, device)
 
     ctx = torch.enable_grad() if treino else torch.no_grad()
     with ctx:

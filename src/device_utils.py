@@ -45,10 +45,13 @@ def patch_config_for_device(config: dict, device) -> dict:
 
 
 def optimizer_step(optimizer):
-    """Drop-in para optimizer.step() que funciona em CPU, GPU e TPU."""
     if TPU_AVAILABLE:
         xm.optimizer_step(optimizer)
-        xm.mark_step()
+        try:
+            import torch_xla
+            torch_xla.sync()
+        except AttributeError:
+            xm.mark_step()
     else:
         optimizer.step()
 
@@ -59,3 +62,11 @@ def save_checkpoint(obj, path: str):
         xm.save(obj, path)
     else:
         torch.save(obj, path)
+
+
+def wrap_dataloader(loader, device):
+    """Envolve o DataLoader com MpDeviceLoader na TPU."""
+    if TPU_AVAILABLE:
+        import torch_xla.distributed.parallel_loader as pl
+        return pl.MpDeviceLoader(loader, device)
+    return loader
