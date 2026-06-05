@@ -153,7 +153,7 @@ def configurar_logging(results_dir, tag='MAIN'):
     os.makedirs(results_dir, exist_ok=True)
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
     log_path = os.path.join(results_dir, f'script_09_{tag}_{ts}.log')
-    logger = logging.getLogger(f'rescue2_e7_{tag}')
+    # logger = logging.getLogger(f'rescue2_e7_{tag}')
     logger.setLevel(logging.INFO)
     if not logger.handlers:
         fmt = logging.Formatter('%(asctime)s  %(levelname)-8s  %(message)s',
@@ -387,6 +387,17 @@ def executar_epoca(model, loader, criterion, optimizer, device, treino=True, gra
     probs_np = torch.cat(probs_l).cpu().numpy()
     preds_np = torch.cat(preds_l).cpu().numpy()
     loss_val = total_loss.item() / max(len(labels_l), 1)
+
+    if np.isnan(probs_np).any():
+        nan_pct = np.isnan(probs_np).mean() * 100
+        logger.warning(f'  NaN em probs: {nan_pct:.1f}% dos valores')
+        logger.warning(f'  loss_val: {loss_val}')
+        # substitui NaN por 0.5 para não travar — investigue a causa
+        probs_np = np.nan_to_num(probs_np, nan=0.5)
+
+    if np.isnan(labels_np).any():
+        logger.warning('  NaN em labels!')
+
 
     return {
         'loss':     loss_val,
@@ -983,8 +994,7 @@ def main():
         config['label_col']].values[train_idx]
     weights = compute_class_weight(
         'balanced', classes=np.array([0, 1]), y=y_train)
-    criterion = nn.CrossEntropyLoss(weight=torch.tensor(
-        weights, dtype=torch.float32).to(device))
+    criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights, dtype=torch.float32).to(device))
 
     for i, (model_name, mode) in enumerate(config['models_modes'].items(), 1):
         logger.info(f'\n{"="*70}')
