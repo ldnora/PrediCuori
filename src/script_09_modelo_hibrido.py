@@ -349,7 +349,7 @@ class CNNOnlyClassifier(nn.Module):
 # In[44]:
 
 
-def executar_epoca(model, loader, criterion, optimizer, device, treino=True, grad_clip=1.0):
+def executar_epoca(model, loader, criterion, optimizer, device, treino=True, grad_clip=1.0, , logger):
     model.train() if treino else model.eval()
     total_loss, labels_l, probs_l, preds_l = 0.0, [], [], []
     loader = wrap_dataloader(loader, device)
@@ -458,7 +458,7 @@ def fase_warmup(model, train_loader, val_loader, criterion, config, device, ckpt
     for ep in range(1, config['warmup_epochs'] + 1):
         t0 = time.time()
         tr = executar_epoca(model, train_loader, criterion,
-                            opt, device, True, config['grad_clip'])
+                            opt, device, True, config['grad_clip'], logger)
         vl = executar_epoca(model, val_loader, criterion, opt, device, False)
         dt = time.time() - t0
         sched.step(vl['auc_roc'])
