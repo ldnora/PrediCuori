@@ -250,12 +250,23 @@ class HybridECGClassifier(nn.Module):
             nn.Linear(128, config['n_classes']),
         )
 
-    def forward(self, image, params):
-        cnn_features = self.cnn_branch(image)
-        mlp_features = self.mlp_branch(params)
-        fused = torch.cat([cnn_features, mlp_features], dim=1)
 
-        return self.fusion(fused)
+    def forward(self, imgs, params):
+        if imgs is not None:
+            x_img = self.cnn_branch(imgs)
+            if torch.isnan(x_img).any():
+                print(f'NaN após cnn_branch')
+
+        if params is not None:
+            x_params = self.mlp_branch(params)
+            if torch.isnan(x_params).any():
+                print(f'NaN após mlp_branch')
+
+        x = self.fusion(torch.cat([x_img, x_params], dim=1))
+        if torch.isnan(x).any():
+            print(f'NaN após fusion')
+
+        return x
 
     def congelar_cnn(self):
         for p in self.cnn_branch.parameters():
@@ -376,11 +387,11 @@ def executar_epoca(model, loader, criterion, optimizer, device, logger, treino=T
             logits = model(imgs, params)
             loss = criterion(logits, labels)
 
-            if logger and torch.isnan(logits).any():
-                logger.warning(f'NaN em logits — min={imgs.min():.3f} max={imgs.max():.3f}')
+            # if logger and torch.isnan(logits).any():
+            #     logger.warning(f'NaN em logits — min={imgs.min():.3f} max={imgs.max():.3f}')
 
-            if logger and torch.isnan(loss):
-                logger.warning('NaN na loss')
+            # if logger and torch.isnan(loss):
+            #     logger.warning('NaN na loss')
 
             if treino:
                 loss.backward()
@@ -401,15 +412,15 @@ def executar_epoca(model, loader, criterion, optimizer, device, logger, treino=T
     preds_np = torch.cat(preds_l).cpu().numpy()
     loss_val = total_loss.item() / max(len(labels_l), 1)
 
-    if np.isnan(probs_np).any():
-        nan_pct = np.isnan(probs_np).mean() * 100
-        logger.warning(f'  NaN em probs: {nan_pct:.1f}% dos valores')
-        logger.warning(f'  loss_val: {loss_val}')
-        # substitui NaN por 0.5 para não travar — investigue a causa
-        probs_np = np.nan_to_num(probs_np, nan=0.5)
+    # if np.isnan(probs_np).any():
+    #     nan_pct = np.isnan(probs_np).mean() * 100
+    #     logger.warning(f'  NaN em probs: {nan_pct:.1f}% dos valores')
+    #     logger.warning(f'  loss_val: {loss_val}')
+    #     # substitui NaN por 0.5 para não travar — investigue a causa
+    #     probs_np = np.nan_to_num(probs_np, nan=0.5)
 
-    if np.isnan(labels_np).any():
-        logger.warning('  NaN em labels!')
+    # if np.isnan(labels_np).any():
+    #     logger.warning('  NaN em labels!')
 
 
     return {
