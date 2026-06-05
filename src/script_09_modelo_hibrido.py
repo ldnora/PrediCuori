@@ -153,7 +153,7 @@ def configurar_logging(results_dir, tag='MAIN'):
     os.makedirs(results_dir, exist_ok=True)
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
     log_path = os.path.join(results_dir, f'script_09_{tag}_{ts}.log')
-    # logger = logging.getLogger(f'rescue2_e7_{tag}')
+    logger = logging.getLogger(f'rescue2_e7_{tag}')
     logger.setLevel(logging.INFO)
     if not logger.handlers:
         fmt = logging.Formatter('%(asctime)s  %(levelname)-8s  %(message)s',
