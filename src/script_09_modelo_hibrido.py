@@ -1054,7 +1054,7 @@ def main():
 
         model = criar_modelo(model_name=model_name, config=config)
 
-        substituir_bn(model)
+        # substituir_bn(model)
         model.to(device)
 
         teste_sanidade(model, train_loader, device, config, logger)
