@@ -1,0 +1,67 @@
+{
+  "densenet121_hybrid": {
+    "model_name": "densenet121_hybrid",
+    "n_test": 522,
+    "auc_roc": 0.9216927453769559,
+    "accuracy": 0.8352490421455939,
+    "f1_macro": 0.8124498663101605,
+    "f1_normal": 0.7470588235294118,
+    "f1_anormal": 0.8778409090909091,
+    "precision_normal": 0.675531914893617,
+    "precision_anormal": 0.9251497005988024,
+    "recall_normal": 0.8355263157894737,
+    "recall_anormal": 0.8351351351351352
+  },
+  "resnet50_hybrid": {
+    "model_name": "resnet50_hybrid",
+    "n_test": 522,
+    "auc_roc": 0.9293207681365576,
+    "accuracy": 0.8716475095785441,
+    "f1_macro": 0.8513231449401663,
+    "f1_normal": 0.7963525835866262,
+    "f1_anormal": 0.9062937062937063,
+    "precision_normal": 0.7401129943502824,
+    "precision_anormal": 0.9391304347826087,
+    "recall_normal": 0.8618421052631579,
+    "recall_anormal": 0.8756756756756757
+  },
+  "efficientnet_b0_hybrid": {
+    "model_name": "efficientnet_b0_hybrid",
+    "n_test": 522,
+    "auc_roc": 0.9024359886201991,
+    "accuracy": 0.7873563218390804,
+    "f1_macro": 0.771625642945825,
+    "f1_normal": 0.7116883116883117,
+    "f1_anormal": 0.8315629742033384,
+    "precision_normal": 0.5879828326180258,
+    "precision_anormal": 0.9480968858131488,
+    "recall_normal": 0.9013157894736842,
+    "recall_anormal": 0.7405405405405405
+  },
+  "cnn_only": {
+    "model_name": "cnn_only",
+    "n_test": 522,
+    "auc_roc": 0.9364509246088194,
+    "accuracy": 0.8754789272030651,
+    "f1_macro": 0.8527720765949691,
+    "f1_normal": 0.7949526813880127,
+    "f1_anormal": 0.9105914718019257,
+    "precision_normal": 0.7636363636363637,
+    "precision_anormal": 0.927170868347339,
+    "recall_normal": 0.8289473684210527,
+    "recall_anormal": 0.8945945945945946
+  },
+  "mlp_only": {
+    "model_name": "mlp_only",
+    "n_test": 522,
+    "auc_roc": 0.8648826458036983,
+    "accuracy": 0.7337164750957854,
+    "f1_macro": 0.722488038277512,
+    "f1_normal": 0.6666666666666666,
+    "f1_anormal": 0.7783094098883573,
+    "precision_normal": 0.5245283018867924,
+    "precision_anormal": 0.9494163424124513,
+    "recall_normal": 0.9144736842105263,
+    "recall_anormal": 0.6594594594594595
+  }
+}

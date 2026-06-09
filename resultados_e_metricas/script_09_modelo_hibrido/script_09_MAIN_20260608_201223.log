@@ -1,0 +1,557 @@
+20:12:23  INFO      
+======================================================================
+  SCRIPT 09
+  Estudo Comparativo: 1 Datasets x 5 Arquiteturas
+  08/06/2026 20:12:23
+======================================================================
+20:12:23  INFO        Device: cuda
+20:12:23  INFO      
+======================================================================
+20:12:23  INFO        INICIANDO O 1º MODELO: densenet121_hybrid
+20:12:23  INFO      ======================================================================
+20:12:24  INFO      
+  TESTES DE SANIDADE
+20:12:27  INFO        [1] Shape imagem  : (32, 1, 272, 512)  OK
+20:12:27  INFO        [2] Shape params  : (32, 14)  OK
+20:12:27  INFO        [3] Shape logits  : (32, 2)  OK
+20:12:27  INFO        [4] Logits validos: OK
+20:12:27  INFO        [5] Parametros    : 7,264,802  OK
+20:12:27  INFO        Todos os testes passaram.
+
+20:12:27  INFO      
+  FASE 1 — WARM-UP | 10 epocas | CNN congelada
+20:12:27  INFO        Parametros treinaveis: 317,218/7,264,802
+20:13:42  INFO        E01/10 tr_auc=0.7437 tr_loss=0.5910 | val_auc=0.8642 val_loss=0.4666 | 75s
+20:13:42  INFO          Checkpoint salvo (val AUC=0.8642)
+20:14:47  INFO        E02/10 tr_auc=0.8234 tr_loss=0.5113 | val_auc=0.8686 val_loss=0.4368 | 65s
+20:14:48  INFO          Checkpoint salvo (val AUC=0.8686)
+20:15:53  INFO        E03/10 tr_auc=0.8568 tr_loss=0.4642 | val_auc=0.8885 val_loss=0.4070 | 65s
+20:15:53  INFO          Checkpoint salvo (val AUC=0.8885)
+20:16:59  INFO        E04/10 tr_auc=0.8660 tr_loss=0.4523 | val_auc=0.8795 val_loss=0.4423 | 66s
+20:18:07  INFO        E05/10 tr_auc=0.8711 tr_loss=0.4496 | val_auc=0.8944 val_loss=0.4104 | 68s
+20:18:07  INFO          Checkpoint salvo (val AUC=0.8944)
+20:19:15  INFO        E06/10 tr_auc=0.8813 tr_loss=0.4295 | val_auc=0.8927 val_loss=0.4043 | 68s
+20:20:21  INFO        E07/10 tr_auc=0.8729 tr_loss=0.4403 | val_auc=0.8953 val_loss=0.3910 | 65s
+20:20:21  INFO          Checkpoint salvo (val AUC=0.8953)
+20:21:27  INFO        E08/10 tr_auc=0.8763 tr_loss=0.4324 | val_auc=0.8943 val_loss=0.3933 | 66s
+20:22:33  INFO        E09/10 tr_auc=0.8858 tr_loss=0.4150 | val_auc=0.9014 val_loss=0.3934 | 66s
+20:22:33  INFO          Checkpoint salvo (val AUC=0.9014)
+20:23:39  INFO        E10/10 tr_auc=0.8873 tr_loss=0.4118 | val_auc=0.8999 val_loss=0.4079 | 65s
+20:23:39  INFO        Melhor val AUC-ROC (fase 1): 0.9014
+20:23:39  INFO      
+  FASE 2 — FINE-TUNING | ate 40 epocas | rede completa
+20:24:51  INFO        E01/40 tr_auc=0.8983 tr_loss=0.3948 | val_auc=0.9080 val_loss=0.3776 | 72s
+20:24:51  INFO          Checkpoint salvo (val AUC=0.9080)
+20:26:03  INFO        E02/40 tr_auc=0.8943 tr_loss=0.4055 | val_auc=0.9093 val_loss=0.3826 | 72s
+20:26:03  INFO          Checkpoint salvo (val AUC=0.9093)
+20:27:16  INFO        E03/40 tr_auc=0.9108 tr_loss=0.3711 | val_auc=0.9163 val_loss=0.3653 | 73s
+20:27:16  INFO          Checkpoint salvo (val AUC=0.9163)
+20:28:29  INFO        E04/40 tr_auc=0.9183 tr_loss=0.3543 | val_auc=0.9184 val_loss=0.3881 | 73s
+20:28:29  INFO          Checkpoint salvo (val AUC=0.9184)
+20:29:42  INFO        E05/40 tr_auc=0.9221 tr_loss=0.3494 | val_auc=0.9219 val_loss=0.3690 | 73s
+20:29:42  INFO          Checkpoint salvo (val AUC=0.9219)
+20:30:54  INFO        E06/40 tr_auc=0.9309 tr_loss=0.3319 | val_auc=0.9216 val_loss=0.3856 | 72s
+20:32:07  INFO        E07/40 tr_auc=0.9279 tr_loss=0.3350 | val_auc=0.9220 val_loss=0.3696 | 73s
+20:32:07  INFO          Checkpoint salvo (val AUC=0.9220)
+20:33:19  INFO        E08/40 tr_auc=0.9322 tr_loss=0.3255 | val_auc=0.9208 val_loss=0.3719 | 72s
+20:34:31  INFO        E09/40 tr_auc=0.9382 tr_loss=0.3140 | val_auc=0.9223 val_loss=0.3701 | 72s
+20:34:31  INFO          Checkpoint salvo (val AUC=0.9223)
+20:35:45  INFO        E10/40 tr_auc=0.9384 tr_loss=0.3156 | val_auc=0.9253 val_loss=0.3645 | 73s
+20:35:45  INFO          Checkpoint salvo (val AUC=0.9253)
+20:36:58  INFO        E11/40 tr_auc=0.9465 tr_loss=0.2917 | val_auc=0.9285 val_loss=0.3579 | 73s
+20:36:58  INFO          Checkpoint salvo (val AUC=0.9285)
+20:38:11  INFO        E12/40 tr_auc=0.9533 tr_loss=0.2715 | val_auc=0.9285 val_loss=0.3547 | 73s
+20:39:23  INFO        E13/40 tr_auc=0.9511 tr_loss=0.2745 | val_auc=0.9285 val_loss=0.3604 | 72s
+20:40:35  INFO        E14/40 tr_auc=0.9568 tr_loss=0.2607 | val_auc=0.9325 val_loss=0.3524 | 72s
+20:40:35  INFO          Checkpoint salvo (val AUC=0.9325)
+20:41:46  INFO        E15/40 tr_auc=0.9587 tr_loss=0.2519 | val_auc=0.9328 val_loss=0.3531 | 71s
+20:41:46  INFO          Checkpoint salvo (val AUC=0.9328)
+20:42:58  INFO        E16/40 tr_auc=0.9640 tr_loss=0.2376 | val_auc=0.9336 val_loss=0.3657 | 72s
+20:42:58  INFO          Checkpoint salvo (val AUC=0.9336)
+20:44:11  INFO        E17/40 tr_auc=0.9627 tr_loss=0.2440 | val_auc=0.9336 val_loss=0.3595 | 73s
+20:44:11  INFO          Checkpoint salvo (val AUC=0.9336)
+20:45:24  INFO        E18/40 tr_auc=0.9631 tr_loss=0.2413 | val_auc=0.9309 val_loss=0.3682 | 73s
+20:46:37  INFO        E19/40 tr_auc=0.9664 tr_loss=0.2279 | val_auc=0.9309 val_loss=0.3721 | 73s
+20:47:50  INFO        E20/40 tr_auc=0.9668 tr_loss=0.2296 | val_auc=0.9340 val_loss=0.3595 | 73s
+20:47:50  INFO          Checkpoint salvo (val AUC=0.9340)
+20:49:03  INFO        E21/40 tr_auc=0.9685 tr_loss=0.2255 | val_auc=0.9311 val_loss=0.3650 | 72s
+20:50:16  INFO        E22/40 tr_auc=0.9679 tr_loss=0.2283 | val_auc=0.9358 val_loss=0.3736 | 73s
+20:50:16  INFO          Checkpoint salvo (val AUC=0.9358)
+20:51:29  INFO        E23/40 tr_auc=0.9668 tr_loss=0.2287 | val_auc=0.9361 val_loss=0.3664 | 73s
+20:51:29  INFO          Checkpoint salvo (val AUC=0.9361)
+20:52:43  INFO        E24/40 tr_auc=0.9736 tr_loss=0.2041 | val_auc=0.9359 val_loss=0.3725 | 73s
+20:53:55  INFO        E25/40 tr_auc=0.9768 tr_loss=0.1873 | val_auc=0.9388 val_loss=0.3537 | 73s
+20:53:55  INFO          Checkpoint salvo (val AUC=0.9388)
+20:55:07  INFO        E26/40 tr_auc=0.9781 tr_loss=0.1824 | val_auc=0.9392 val_loss=0.3608 | 72s
+20:55:07  INFO          Checkpoint salvo (val AUC=0.9392)
+20:56:19  INFO        E27/40 tr_auc=0.9806 tr_loss=0.1762 | val_auc=0.9402 val_loss=0.3522 | 71s
+20:56:19  INFO          Checkpoint salvo (val AUC=0.9402)
+20:57:31  INFO        E28/40 tr_auc=0.9820 tr_loss=0.1648 | val_auc=0.9391 val_loss=0.3656 | 72s
+20:58:45  INFO        E29/40 tr_auc=0.9773 tr_loss=0.1894 | val_auc=0.9383 val_loss=0.3821 | 74s
+20:59:59  INFO        E30/40 tr_auc=0.9845 tr_loss=0.1566 | val_auc=0.9397 val_loss=0.3693 | 74s
+21:01:12  INFO        E31/40 tr_auc=0.9849 tr_loss=0.1458 | val_auc=0.9387 val_loss=0.3851 | 74s
+21:02:24  INFO        E32/40 tr_auc=0.9809 tr_loss=0.1694 | val_auc=0.9401 val_loss=0.3848 | 72s
+21:03:36  INFO        E33/40 tr_auc=0.9880 tr_loss=0.1339 | val_auc=0.9352 val_loss=0.4179 | 72s
+21:04:48  INFO        E34/40 tr_auc=0.9875 tr_loss=0.1379 | val_auc=0.9351 val_loss=0.4193 | 72s
+21:05:59  INFO        E35/40 tr_auc=0.9896 tr_loss=0.1296 | val_auc=0.9393 val_loss=0.3993 | 71s
+21:07:12  INFO        E36/40 tr_auc=0.9873 tr_loss=0.1390 | val_auc=0.9377 val_loss=0.4277 | 73s
+21:08:24  INFO        E37/40 tr_auc=0.9909 tr_loss=0.1217 | val_auc=0.9365 val_loss=0.4129 | 71s
+21:08:24  INFO          Early stopping.
+21:08:24  INFO        Melhor val AUC-ROC (fase 2): 0.9402
+21:08:24  INFO      
+  AVALIACAO FINAL — test set canonico (densenet121_hybrid)
+21:08:37  INFO        AUC-ROC  : 0.9217
+21:08:37  INFO        Accuracy : 0.8352
+21:08:37  INFO        F1 macro : 0.8124
+21:08:37  INFO                    precision    recall  f1-score   support
+
+      NORMAL     0.6755    0.8355    0.7471       152
+     ANORMAL     0.9251    0.8351    0.8778       370
+
+    accuracy                         0.8352       522
+   macro avg     0.8003    0.8353    0.8124       522
+weighted avg     0.8525    0.8352    0.8398       522
+
+21:08:37  INFO        densenet121_hybrid concluido em 56.2 min | AUC=0.9217
+21:08:37  INFO      
+======================================================================
+21:08:37  INFO      
+======================================================================
+21:08:37  INFO        INICIANDO O 2º MODELO: resnet50_hybrid
+21:08:37  INFO      ======================================================================
+21:08:38  INFO      
+  TESTES DE SANIDADE
+21:08:40  INFO        [1] Shape imagem  : (32, 1, 272, 512)  OK
+21:08:40  INFO        [2] Shape params  : (32, 14)  OK
+21:08:41  INFO        [3] Shape logits  : (32, 2)  OK
+21:08:41  INFO        [4] Logits validos: OK
+21:08:41  INFO        [5] Parametros    : 24,081,122  OK
+21:08:41  INFO        Todos os testes passaram.
+
+21:08:41  INFO      
+  FASE 1 — WARM-UP | 10 epocas | CNN congelada
+21:08:41  INFO        Parametros treinaveis: 579,362/24,081,122
+21:09:42  INFO        E01/10 tr_auc=0.7355 tr_loss=0.6027 | val_auc=0.8120 val_loss=0.5271 | 62s
+21:09:42  INFO          Checkpoint salvo (val AUC=0.8120)
+21:10:42  INFO        E02/10 tr_auc=0.8057 tr_loss=0.5323 | val_auc=0.8663 val_loss=0.4563 | 59s
+21:10:42  INFO          Checkpoint salvo (val AUC=0.8663)
+21:11:41  INFO        E03/10 tr_auc=0.8328 tr_loss=0.4973 | val_auc=0.8959 val_loss=0.4142 | 59s
+21:11:41  INFO          Checkpoint salvo (val AUC=0.8959)
+21:12:39  INFO        E04/10 tr_auc=0.8647 tr_loss=0.4556 | val_auc=0.8841 val_loss=0.4263 | 58s
+21:13:37  INFO        E05/10 tr_auc=0.8619 tr_loss=0.4549 | val_auc=0.8871 val_loss=0.4132 | 58s
+21:14:35  INFO        E06/10 tr_auc=0.8768 tr_loss=0.4355 | val_auc=0.8905 val_loss=0.4085 | 58s
+21:15:33  INFO        E07/10 tr_auc=0.8763 tr_loss=0.4349 | val_auc=0.8967 val_loss=0.3964 | 58s
+21:15:33  INFO          Checkpoint salvo (val AUC=0.8967)
+21:16:31  INFO        E08/10 tr_auc=0.8780 tr_loss=0.4319 | val_auc=0.8975 val_loss=0.4058 | 58s
+21:16:31  INFO          Checkpoint salvo (val AUC=0.8975)
+21:17:28  INFO        E09/10 tr_auc=0.8818 tr_loss=0.4281 | val_auc=0.8989 val_loss=0.3952 | 58s
+21:17:29  INFO          Checkpoint salvo (val AUC=0.8989)
+21:18:27  INFO        E10/10 tr_auc=0.8861 tr_loss=0.4135 | val_auc=0.8998 val_loss=0.4073 | 58s
+21:18:27  INFO          Checkpoint salvo (val AUC=0.8998)
+21:18:27  INFO        Melhor val AUC-ROC (fase 1): 0.8998
+21:18:27  INFO      
+  FASE 2 — FINE-TUNING | ate 40 epocas | rede completa
+21:19:31  INFO        E01/40 tr_auc=0.8778 tr_loss=0.4286 | val_auc=0.9081 val_loss=0.3779 | 64s
+21:19:31  INFO          Checkpoint salvo (val AUC=0.9081)
+21:20:35  INFO        E02/40 tr_auc=0.9106 tr_loss=0.3714 | val_auc=0.9141 val_loss=0.3716 | 64s
+21:20:36  INFO          Checkpoint salvo (val AUC=0.9141)
+21:21:40  INFO        E03/40 tr_auc=0.9176 tr_loss=0.3573 | val_auc=0.9191 val_loss=0.3597 | 64s
+21:21:40  INFO          Checkpoint salvo (val AUC=0.9191)
+21:22:44  INFO        E04/40 tr_auc=0.9235 tr_loss=0.3483 | val_auc=0.9222 val_loss=0.3651 | 64s
+21:22:45  INFO          Checkpoint salvo (val AUC=0.9222)
+21:23:49  INFO        E05/40 tr_auc=0.9267 tr_loss=0.3367 | val_auc=0.9262 val_loss=0.3554 | 64s
+21:23:49  INFO          Checkpoint salvo (val AUC=0.9262)
+21:24:53  INFO        E06/40 tr_auc=0.9350 tr_loss=0.3191 | val_auc=0.9249 val_loss=0.3578 | 64s
+21:25:57  INFO        E07/40 tr_auc=0.9452 tr_loss=0.2917 | val_auc=0.9267 val_loss=0.3580 | 64s
+21:25:57  INFO          Checkpoint salvo (val AUC=0.9267)
+21:27:01  INFO        E08/40 tr_auc=0.9438 tr_loss=0.2966 | val_auc=0.9318 val_loss=0.3542 | 64s
+21:27:01  INFO          Checkpoint salvo (val AUC=0.9318)
+21:28:06  INFO        E09/40 tr_auc=0.9487 tr_loss=0.2815 | val_auc=0.9364 val_loss=0.3401 | 64s
+21:28:06  INFO          Checkpoint salvo (val AUC=0.9364)
+21:29:10  INFO        E10/40 tr_auc=0.9531 tr_loss=0.2689 | val_auc=0.9399 val_loss=0.3364 | 64s
+21:29:10  INFO          Checkpoint salvo (val AUC=0.9399)
+21:30:14  INFO        E11/40 tr_auc=0.9566 tr_loss=0.2589 | val_auc=0.9407 val_loss=0.3159 | 64s
+21:30:14  INFO          Checkpoint salvo (val AUC=0.9407)
+21:31:18  INFO        E12/40 tr_auc=0.9586 tr_loss=0.2571 | val_auc=0.9371 val_loss=0.3409 | 64s
+21:32:21  INFO        E13/40 tr_auc=0.9579 tr_loss=0.2570 | val_auc=0.9423 val_loss=0.3261 | 64s
+21:32:22  INFO          Checkpoint salvo (val AUC=0.9423)
+21:33:26  INFO        E14/40 tr_auc=0.9663 tr_loss=0.2311 | val_auc=0.9441 val_loss=0.3252 | 64s
+21:33:26  INFO          Checkpoint salvo (val AUC=0.9441)
+21:34:30  INFO        E15/40 tr_auc=0.9699 tr_loss=0.2161 | val_auc=0.9458 val_loss=0.3242 | 64s
+21:34:30  INFO          Checkpoint salvo (val AUC=0.9458)
+21:35:33  INFO        E16/40 tr_auc=0.9745 tr_loss=0.2025 | val_auc=0.9471 val_loss=0.3248 | 64s
+21:35:34  INFO          Checkpoint salvo (val AUC=0.9471)
+21:36:38  INFO        E17/40 tr_auc=0.9701 tr_loss=0.2175 | val_auc=0.9452 val_loss=0.3295 | 64s
+21:37:41  INFO        E18/40 tr_auc=0.9746 tr_loss=0.1993 | val_auc=0.9447 val_loss=0.3304 | 63s
+21:38:44  INFO        E19/40 tr_auc=0.9729 tr_loss=0.2071 | val_auc=0.9499 val_loss=0.3218 | 63s
+21:38:44  INFO          Checkpoint salvo (val AUC=0.9499)
+21:39:47  INFO        E20/40 tr_auc=0.9783 tr_loss=0.1833 | val_auc=0.9459 val_loss=0.3338 | 63s
+21:40:50  INFO        E21/40 tr_auc=0.9824 tr_loss=0.1643 | val_auc=0.9478 val_loss=0.3337 | 63s
+21:41:53  INFO        E22/40 tr_auc=0.9790 tr_loss=0.1797 | val_auc=0.9479 val_loss=0.3357 | 63s
+21:42:56  INFO        E23/40 tr_auc=0.9847 tr_loss=0.1518 | val_auc=0.9496 val_loss=0.3379 | 63s
+21:43:59  INFO        E24/40 tr_auc=0.9844 tr_loss=0.1525 | val_auc=0.9517 val_loss=0.3194 | 63s
+21:43:59  INFO          Checkpoint salvo (val AUC=0.9517)
+21:45:02  INFO        E25/40 tr_auc=0.9863 tr_loss=0.1462 | val_auc=0.9529 val_loss=0.3522 | 63s
+21:45:02  INFO          Checkpoint salvo (val AUC=0.9529)
+21:46:05  INFO        E26/40 tr_auc=0.9855 tr_loss=0.1492 | val_auc=0.9475 val_loss=0.3390 | 63s
+21:47:08  INFO        E27/40 tr_auc=0.9890 tr_loss=0.1285 | val_auc=0.9544 val_loss=0.3502 | 63s
+21:47:09  INFO          Checkpoint salvo (val AUC=0.9544)
+21:48:13  INFO        E28/40 tr_auc=0.9903 tr_loss=0.1171 | val_auc=0.9499 val_loss=0.3667 | 64s
+21:49:17  INFO        E29/40 tr_auc=0.9909 tr_loss=0.1207 | val_auc=0.9547 val_loss=0.3749 | 65s
+21:49:17  INFO          Checkpoint salvo (val AUC=0.9547)
+21:50:21  INFO        E30/40 tr_auc=0.9905 tr_loss=0.1219 | val_auc=0.9432 val_loss=0.4381 | 64s
+21:51:25  INFO        E31/40 tr_auc=0.9900 tr_loss=0.1248 | val_auc=0.9476 val_loss=0.4450 | 64s
+21:52:29  INFO        E32/40 tr_auc=0.9915 tr_loss=0.1174 | val_auc=0.9553 val_loss=0.3595 | 64s
+21:52:29  INFO          Checkpoint salvo (val AUC=0.9553)
+21:53:33  INFO        E33/40 tr_auc=0.9918 tr_loss=0.1075 | val_auc=0.9471 val_loss=0.4177 | 64s
+21:54:37  INFO        E34/40 tr_auc=0.9938 tr_loss=0.0961 | val_auc=0.9524 val_loss=0.4119 | 64s
+21:55:40  INFO        E35/40 tr_auc=0.9937 tr_loss=0.0997 | val_auc=0.9514 val_loss=0.4309 | 63s
+21:56:44  INFO        E36/40 tr_auc=0.9953 tr_loss=0.0849 | val_auc=0.9481 val_loss=0.4635 | 63s
+21:57:47  INFO        E37/40 tr_auc=0.9948 tr_loss=0.0866 | val_auc=0.9499 val_loss=0.4758 | 63s
+21:58:51  INFO        E38/40 tr_auc=0.9956 tr_loss=0.0755 | val_auc=0.9497 val_loss=0.5142 | 64s
+21:59:55  INFO        E39/40 tr_auc=0.9950 tr_loss=0.0967 | val_auc=0.9495 val_loss=0.5024 | 64s
+22:00:58  INFO        E40/40 tr_auc=0.9966 tr_loss=0.0726 | val_auc=0.9509 val_loss=0.4925 | 64s
+22:00:58  INFO        Melhor val AUC-ROC (fase 2): 0.9553
+22:00:58  INFO      
+  AVALIACAO FINAL — test set canonico (resnet50_hybrid)
+22:01:09  INFO        AUC-ROC  : 0.9293
+22:01:09  INFO        Accuracy : 0.8716
+22:01:09  INFO        F1 macro : 0.8513
+22:01:09  INFO                    precision    recall  f1-score   support
+
+      NORMAL     0.7401    0.8618    0.7964       152
+     ANORMAL     0.9391    0.8757    0.9063       370
+
+    accuracy                         0.8716       522
+   macro avg     0.8396    0.8688    0.8513       522
+weighted avg     0.8812    0.8716    0.8743       522
+
+22:01:09  INFO        resnet50_hybrid concluido em 52.5 min | AUC=0.9293
+22:01:09  INFO      
+======================================================================
+22:01:09  INFO      
+======================================================================
+22:01:09  INFO        INICIANDO O 3º MODELO: efficientnet_b0_hybrid
+22:01:09  INFO      ======================================================================
+22:01:10  INFO      
+  TESTES DE SANIDADE
+22:01:12  INFO        [1] Shape imagem  : (32, 1, 272, 512)  OK
+22:01:12  INFO        [2] Shape params  : (32, 14)  OK
+22:01:13  INFO        [3] Shape logits  : (32, 2)  OK
+22:01:13  INFO        [4] Logits validos: OK
+22:01:13  INFO        [5] Parametros    : 4,389,726  OK
+22:01:13  INFO        Todos os testes passaram.
+
+22:01:13  INFO      
+  FASE 1 — WARM-UP | 10 epocas | CNN congelada
+22:01:13  INFO        Parametros treinaveis: 382,754/4,389,726
+22:02:16  INFO        E01/10 tr_auc=0.6853 tr_loss=0.6503 | val_auc=0.8598 val_loss=0.5364 | 64s
+22:02:16  INFO          Checkpoint salvo (val AUC=0.8598)
+22:03:15  INFO        E02/10 tr_auc=0.7878 tr_loss=0.5469 | val_auc=0.8647 val_loss=0.4846 | 59s
+22:03:15  INFO          Checkpoint salvo (val AUC=0.8647)
+22:04:12  INFO        E03/10 tr_auc=0.8261 tr_loss=0.5044 | val_auc=0.8782 val_loss=0.4663 | 57s
+22:04:12  INFO          Checkpoint salvo (val AUC=0.8782)
+22:05:08  INFO        E04/10 tr_auc=0.8463 tr_loss=0.4782 | val_auc=0.8926 val_loss=0.4190 | 56s
+22:05:08  INFO          Checkpoint salvo (val AUC=0.8926)
+22:06:04  INFO        E05/10 tr_auc=0.8584 tr_loss=0.4609 | val_auc=0.8910 val_loss=0.4564 | 56s
+22:06:59  INFO        E06/10 tr_auc=0.8678 tr_loss=0.4463 | val_auc=0.8924 val_loss=0.4160 | 56s
+22:07:55  INFO        E07/10 tr_auc=0.8684 tr_loss=0.4440 | val_auc=0.8941 val_loss=0.4058 | 56s
+22:07:55  INFO          Checkpoint salvo (val AUC=0.8941)
+22:08:51  INFO        E08/10 tr_auc=0.8521 tr_loss=0.4690 | val_auc=0.9032 val_loss=0.3838 | 56s
+22:08:51  INFO          Checkpoint salvo (val AUC=0.9032)
+22:09:46  INFO        E09/10 tr_auc=0.8668 tr_loss=0.4446 | val_auc=0.8937 val_loss=0.4149 | 55s
+22:10:42  INFO        E10/10 tr_auc=0.8680 tr_loss=0.4503 | val_auc=0.8953 val_loss=0.3886 | 56s
+22:10:42  INFO        Melhor val AUC-ROC (fase 1): 0.9032
+22:10:42  INFO      
+  FASE 2 — FINE-TUNING | ate 40 epocas | rede completa
+22:11:42  INFO        E01/40 tr_auc=0.8719 tr_loss=0.4336 | val_auc=0.9020 val_loss=0.3828 | 60s
+22:11:42  INFO          Checkpoint salvo (val AUC=0.9020)
+22:12:42  INFO        E02/40 tr_auc=0.8803 tr_loss=0.4195 | val_auc=0.9043 val_loss=0.3807 | 60s
+22:12:42  INFO          Checkpoint salvo (val AUC=0.9043)
+22:13:41  INFO        E03/40 tr_auc=0.8898 tr_loss=0.4144 | val_auc=0.9072 val_loss=0.3734 | 60s
+22:13:41  INFO          Checkpoint salvo (val AUC=0.9072)
+22:14:41  INFO        E04/40 tr_auc=0.8808 tr_loss=0.4187 | val_auc=0.9058 val_loss=0.3740 | 60s
+22:15:41  INFO        E05/40 tr_auc=0.8899 tr_loss=0.4085 | val_auc=0.9048 val_loss=0.3821 | 60s
+22:16:40  INFO        E06/40 tr_auc=0.8900 tr_loss=0.4080 | val_auc=0.9077 val_loss=0.3756 | 60s
+22:16:40  INFO          Checkpoint salvo (val AUC=0.9077)
+22:17:40  INFO        E07/40 tr_auc=0.8927 tr_loss=0.4097 | val_auc=0.9100 val_loss=0.3754 | 60s
+22:17:40  INFO          Checkpoint salvo (val AUC=0.9100)
+22:18:40  INFO        E08/40 tr_auc=0.8984 tr_loss=0.3955 | val_auc=0.9079 val_loss=0.3798 | 60s
+22:19:40  INFO        E09/40 tr_auc=0.8970 tr_loss=0.4025 | val_auc=0.9085 val_loss=0.3686 | 60s
+22:20:39  INFO        E10/40 tr_auc=0.8924 tr_loss=0.4098 | val_auc=0.9107 val_loss=0.3717 | 60s
+22:20:39  INFO          Checkpoint salvo (val AUC=0.9107)
+22:21:39  INFO        E11/40 tr_auc=0.8983 tr_loss=0.3957 | val_auc=0.9129 val_loss=0.3638 | 59s
+22:21:39  INFO          Checkpoint salvo (val AUC=0.9129)
+22:22:38  INFO        E12/40 tr_auc=0.8942 tr_loss=0.4020 | val_auc=0.9074 val_loss=0.3892 | 60s
+22:23:37  INFO        E13/40 tr_auc=0.9008 tr_loss=0.3897 | val_auc=0.9091 val_loss=0.3831 | 59s
+22:24:36  INFO        E14/40 tr_auc=0.9094 tr_loss=0.3714 | val_auc=0.9079 val_loss=0.3775 | 59s
+22:25:35  INFO        E15/40 tr_auc=0.9123 tr_loss=0.3680 | val_auc=0.9108 val_loss=0.3793 | 59s
+22:26:35  INFO        E16/40 tr_auc=0.9120 tr_loss=0.3677 | val_auc=0.9105 val_loss=0.3714 | 59s
+22:27:35  INFO        E17/40 tr_auc=0.9081 tr_loss=0.3762 | val_auc=0.9120 val_loss=0.3760 | 60s
+22:28:34  INFO        E18/40 tr_auc=0.9085 tr_loss=0.3790 | val_auc=0.9166 val_loss=0.3580 | 59s
+22:28:34  INFO          Checkpoint salvo (val AUC=0.9166)
+22:29:33  INFO        E19/40 tr_auc=0.9115 tr_loss=0.3694 | val_auc=0.9151 val_loss=0.3615 | 59s
+22:30:32  INFO        E20/40 tr_auc=0.9157 tr_loss=0.3591 | val_auc=0.9144 val_loss=0.3616 | 59s
+22:31:32  INFO        E21/40 tr_auc=0.9123 tr_loss=0.3729 | val_auc=0.9147 val_loss=0.3616 | 59s
+22:32:31  INFO        E22/40 tr_auc=0.9214 tr_loss=0.3502 | val_auc=0.9108 val_loss=0.3764 | 59s
+22:33:30  INFO        E23/40 tr_auc=0.9214 tr_loss=0.3496 | val_auc=0.9123 val_loss=0.3628 | 59s
+22:34:29  INFO        E24/40 tr_auc=0.9174 tr_loss=0.3605 | val_auc=0.9136 val_loss=0.3620 | 59s
+22:35:28  INFO        E25/40 tr_auc=0.9166 tr_loss=0.3620 | val_auc=0.9134 val_loss=0.3663 | 59s
+22:36:27  INFO        E26/40 tr_auc=0.9144 tr_loss=0.3678 | val_auc=0.9143 val_loss=0.3607 | 59s
+22:37:26  INFO        E27/40 tr_auc=0.9172 tr_loss=0.3585 | val_auc=0.9131 val_loss=0.3627 | 59s
+22:38:25  INFO        E28/40 tr_auc=0.9200 tr_loss=0.3546 | val_auc=0.9135 val_loss=0.3663 | 59s
+22:38:25  INFO          Early stopping.
+22:38:25  INFO        Melhor val AUC-ROC (fase 2): 0.9166
+22:38:25  INFO      
+  AVALIACAO FINAL — test set canonico (efficientnet_b0_hybrid)
+22:38:35  INFO        AUC-ROC  : 0.9024
+22:38:35  INFO        Accuracy : 0.7874
+22:38:35  INFO        F1 macro : 0.7716
+22:38:35  INFO                    precision    recall  f1-score   support
+
+      NORMAL     0.5880    0.9013    0.7117       152
+     ANORMAL     0.9481    0.7405    0.8316       370
+
+    accuracy                         0.7874       522
+   macro avg     0.7680    0.8209    0.7716       522
+weighted avg     0.8432    0.7874    0.7967       522
+
+22:38:35  INFO        efficientnet_b0_hybrid concluido em 37.4 min | AUC=0.9024
+22:38:35  INFO      
+======================================================================
+22:38:35  INFO      
+======================================================================
+22:38:35  INFO        INICIANDO O 4º MODELO: cnn_only
+22:38:35  INFO      ======================================================================
+22:38:36  INFO      
+  TESTES DE SANIDADE
+22:38:38  INFO        [1] Shape imagem  : (32, 1, 272, 512)  OK
+22:38:39  INFO        [3] Shape logits  : (32, 2)  OK
+22:38:39  INFO        [4] Logits validos: OK
+22:38:39  INFO        [5] Parametros    : 7,211,010  OK
+22:38:39  INFO        Todos os testes passaram.
+
+22:38:39  INFO      
+  FASE 1 — WARM-UP | 10 epocas | CNN congelada
+22:38:39  INFO        Parametros treinaveis: 263,426/7,211,010
+22:39:40  INFO        E01/10 tr_auc=0.7270 tr_loss=0.6143 | val_auc=0.8039 val_loss=0.5273 | 61s
+22:39:40  INFO          Checkpoint salvo (val AUC=0.8039)
+22:40:37  INFO        E02/10 tr_auc=0.7870 tr_loss=0.5559 | val_auc=0.7989 val_loss=0.5618 | 57s
+22:41:34  INFO        E03/10 tr_auc=0.8021 tr_loss=0.5325 | val_auc=0.7973 val_loss=0.5418 | 57s
+22:42:31  INFO        E04/10 tr_auc=0.8033 tr_loss=0.5417 | val_auc=0.8118 val_loss=0.5340 | 57s
+22:42:31  INFO          Checkpoint salvo (val AUC=0.8118)
+22:43:29  INFO        E05/10 tr_auc=0.7960 tr_loss=0.5402 | val_auc=0.8082 val_loss=0.5813 | 58s
+22:44:26  INFO        E06/10 tr_auc=0.8248 tr_loss=0.5114 | val_auc=0.8173 val_loss=0.5549 | 57s
+22:44:26  INFO          Checkpoint salvo (val AUC=0.8173)
+22:45:24  INFO        E07/10 tr_auc=0.8116 tr_loss=0.5292 | val_auc=0.8094 val_loss=0.5230 | 58s
+22:46:21  INFO        E08/10 tr_auc=0.8154 tr_loss=0.5176 | val_auc=0.7995 val_loss=0.5493 | 57s
+22:47:18  INFO        E09/10 tr_auc=0.8167 tr_loss=0.5170 | val_auc=0.8056 val_loss=0.5378 | 57s
+22:48:16  INFO        E10/10 tr_auc=0.8220 tr_loss=0.5164 | val_auc=0.8069 val_loss=0.5406 | 57s
+22:48:16  INFO        Melhor val AUC-ROC (fase 1): 0.8173
+22:48:16  INFO      
+  FASE 2 — FINE-TUNING | ate 40 epocas | rede completa
+22:49:20  INFO        E01/40 tr_auc=0.8343 tr_loss=0.5022 | val_auc=0.8379 val_loss=0.5361 | 64s
+22:49:20  INFO          Checkpoint salvo (val AUC=0.8379)
+22:50:24  INFO        E02/40 tr_auc=0.8658 tr_loss=0.4565 | val_auc=0.8503 val_loss=0.5049 | 64s
+22:50:24  INFO          Checkpoint salvo (val AUC=0.8503)
+22:51:29  INFO        E03/40 tr_auc=0.8879 tr_loss=0.4197 | val_auc=0.8665 val_loss=0.4938 | 64s
+22:51:29  INFO          Checkpoint salvo (val AUC=0.8665)
+22:52:32  INFO        E04/40 tr_auc=0.8961 tr_loss=0.4060 | val_auc=0.8730 val_loss=0.4757 | 64s
+22:52:33  INFO          Checkpoint salvo (val AUC=0.8730)
+22:53:37  INFO        E05/40 tr_auc=0.9069 tr_loss=0.3870 | val_auc=0.8831 val_loss=0.4578 | 64s
+22:53:37  INFO          Checkpoint salvo (val AUC=0.8831)
+22:54:41  INFO        E06/40 tr_auc=0.9167 tr_loss=0.3634 | val_auc=0.8887 val_loss=0.4429 | 64s
+22:54:41  INFO          Checkpoint salvo (val AUC=0.8887)
+22:55:45  INFO        E07/40 tr_auc=0.9203 tr_loss=0.3583 | val_auc=0.8905 val_loss=0.4442 | 64s
+22:55:45  INFO          Checkpoint salvo (val AUC=0.8905)
+22:56:50  INFO        E08/40 tr_auc=0.9248 tr_loss=0.3470 | val_auc=0.8946 val_loss=0.4216 | 64s
+22:56:50  INFO          Checkpoint salvo (val AUC=0.8946)
+22:57:54  INFO        E09/40 tr_auc=0.9302 tr_loss=0.3391 | val_auc=0.8963 val_loss=0.4376 | 64s
+22:57:54  INFO          Checkpoint salvo (val AUC=0.8963)
+22:58:58  INFO        E10/40 tr_auc=0.9338 tr_loss=0.3294 | val_auc=0.9017 val_loss=0.4312 | 64s
+22:58:58  INFO          Checkpoint salvo (val AUC=0.9017)
+23:00:02  INFO        E11/40 tr_auc=0.9379 tr_loss=0.3179 | val_auc=0.9048 val_loss=0.3988 | 64s
+23:00:02  INFO          Checkpoint salvo (val AUC=0.9048)
+23:01:07  INFO        E12/40 tr_auc=0.9387 tr_loss=0.3162 | val_auc=0.9046 val_loss=0.4085 | 64s
+23:02:11  INFO        E13/40 tr_auc=0.9418 tr_loss=0.3091 | val_auc=0.9128 val_loss=0.3961 | 64s
+23:02:11  INFO          Checkpoint salvo (val AUC=0.9128)
+23:03:15  INFO        E14/40 tr_auc=0.9449 tr_loss=0.3034 | val_auc=0.9108 val_loss=0.3895 | 64s
+23:04:20  INFO        E15/40 tr_auc=0.9525 tr_loss=0.2818 | val_auc=0.9173 val_loss=0.3765 | 64s
+23:04:20  INFO          Checkpoint salvo (val AUC=0.9173)
+23:05:25  INFO        E16/40 tr_auc=0.9555 tr_loss=0.2714 | val_auc=0.9191 val_loss=0.3752 | 65s
+23:05:25  INFO          Checkpoint salvo (val AUC=0.9191)
+23:06:29  INFO        E17/40 tr_auc=0.9641 tr_loss=0.2510 | val_auc=0.9223 val_loss=0.3620 | 64s
+23:06:29  INFO          Checkpoint salvo (val AUC=0.9223)
+23:07:34  INFO        E18/40 tr_auc=0.9565 tr_loss=0.2704 | val_auc=0.9213 val_loss=0.3625 | 65s
+23:08:38  INFO        E19/40 tr_auc=0.9670 tr_loss=0.2388 | val_auc=0.9235 val_loss=0.3578 | 64s
+23:08:38  INFO          Checkpoint salvo (val AUC=0.9235)
+23:09:45  INFO        E20/40 tr_auc=0.9671 tr_loss=0.2372 | val_auc=0.9240 val_loss=0.3585 | 67s
+23:09:45  INFO          Checkpoint salvo (val AUC=0.9240)
+23:10:52  INFO        E21/40 tr_auc=0.9676 tr_loss=0.2374 | val_auc=0.9253 val_loss=0.3532 | 66s
+23:10:52  INFO          Checkpoint salvo (val AUC=0.9253)
+23:11:58  INFO        E22/40 tr_auc=0.9719 tr_loss=0.2227 | val_auc=0.9259 val_loss=0.3592 | 66s
+23:11:58  INFO          Checkpoint salvo (val AUC=0.9259)
+23:13:03  INFO        E23/40 tr_auc=0.9750 tr_loss=0.2129 | val_auc=0.9315 val_loss=0.3556 | 65s
+23:13:03  INFO          Checkpoint salvo (val AUC=0.9315)
+23:14:08  INFO        E24/40 tr_auc=0.9739 tr_loss=0.2143 | val_auc=0.9316 val_loss=0.3415 | 65s
+23:14:08  INFO          Checkpoint salvo (val AUC=0.9316)
+23:15:14  INFO        E25/40 tr_auc=0.9786 tr_loss=0.1976 | val_auc=0.9296 val_loss=0.3436 | 66s
+23:16:21  INFO        E26/40 tr_auc=0.9763 tr_loss=0.2045 | val_auc=0.9330 val_loss=0.3367 | 67s
+23:16:21  INFO          Checkpoint salvo (val AUC=0.9330)
+23:17:26  INFO        E27/40 tr_auc=0.9793 tr_loss=0.1949 | val_auc=0.9339 val_loss=0.3342 | 65s
+23:17:26  INFO          Checkpoint salvo (val AUC=0.9339)
+23:18:31  INFO        E28/40 tr_auc=0.9792 tr_loss=0.1924 | val_auc=0.9351 val_loss=0.3401 | 65s
+23:18:31  INFO          Checkpoint salvo (val AUC=0.9351)
+23:19:36  INFO        E29/40 tr_auc=0.9813 tr_loss=0.1839 | val_auc=0.9330 val_loss=0.3482 | 65s
+23:20:42  INFO        E30/40 tr_auc=0.9832 tr_loss=0.1794 | val_auc=0.9348 val_loss=0.3429 | 65s
+23:21:46  INFO        E31/40 tr_auc=0.9841 tr_loss=0.1746 | val_auc=0.9324 val_loss=0.3445 | 65s
+23:22:52  INFO        E32/40 tr_auc=0.9857 tr_loss=0.1647 | val_auc=0.9317 val_loss=0.3507 | 65s
+23:23:58  INFO        E33/40 tr_auc=0.9869 tr_loss=0.1613 | val_auc=0.9360 val_loss=0.3405 | 66s
+23:23:58  INFO          Checkpoint salvo (val AUC=0.9360)
+23:25:03  INFO        E34/40 tr_auc=0.9860 tr_loss=0.1631 | val_auc=0.9375 val_loss=0.3273 | 65s
+23:25:03  INFO          Checkpoint salvo (val AUC=0.9375)
+23:26:08  INFO        E35/40 tr_auc=0.9910 tr_loss=0.1411 | val_auc=0.9363 val_loss=0.3442 | 65s
+23:27:14  INFO        E36/40 tr_auc=0.9867 tr_loss=0.1577 | val_auc=0.9339 val_loss=0.3453 | 66s
+23:28:19  INFO        E37/40 tr_auc=0.9907 tr_loss=0.1389 | val_auc=0.9331 val_loss=0.3563 | 65s
+23:29:24  INFO        E38/40 tr_auc=0.9914 tr_loss=0.1355 | val_auc=0.9349 val_loss=0.3501 | 65s
+23:30:29  INFO        E39/40 tr_auc=0.9913 tr_loss=0.1348 | val_auc=0.9359 val_loss=0.3420 | 65s
+23:31:34  INFO        E40/40 tr_auc=0.9911 tr_loss=0.1354 | val_auc=0.9339 val_loss=0.3670 | 64s
+23:31:34  INFO        Melhor val AUC-ROC (fase 2): 0.9375
+23:31:34  INFO      
+  AVALIACAO FINAL — test set canonico (cnn_only)
+23:31:44  INFO        AUC-ROC  : 0.9365
+23:31:44  INFO        Accuracy : 0.8755
+23:31:44  INFO        F1 macro : 0.8528
+23:31:44  INFO                    precision    recall  f1-score   support
+
+      NORMAL     0.7636    0.8289    0.7950       152
+     ANORMAL     0.9272    0.8946    0.9106       370
+
+    accuracy                         0.8755       522
+   macro avg     0.8454    0.8618    0.8528       522
+weighted avg     0.8796    0.8755    0.8769       522
+
+23:31:44  INFO        cnn_only concluido em 53.1 min | AUC=0.9365
+23:31:44  INFO      
+======================================================================
+23:31:44  INFO      
+======================================================================
+23:31:44  INFO        INICIANDO O 5º MODELO: mlp_only
+23:31:44  INFO      ======================================================================
+23:31:44  INFO      
+  TESTES DE SANIDADE
+23:31:45  INFO        [2] Shape params  : (32, 14)  OK
+23:31:45  INFO        [3] Shape logits  : (32, 2)  OK
+23:31:45  INFO        [4] Logits validos: OK
+23:31:45  INFO        [5] Parametros    : 12,770  OK
+23:31:45  INFO        Todos os testes passaram.
+
+23:31:45  INFO      
+  FASE TREINAMENTO MLP | ate 40 epocas | rede completa
+23:31:45  INFO        E01/40 tr_auc=0.5339 tr_loss=0.7293 | val_auc=0.6302 val_loss=0.6781 | 1s
+23:31:45  INFO          Checkpoint salvo (val AUC=0.6302)
+23:31:46  INFO        E02/40 tr_auc=0.6071 tr_loss=0.6739 | val_auc=0.7726 val_loss=0.6380 | 0s
+23:31:46  INFO          Checkpoint salvo (val AUC=0.7726)
+23:31:46  INFO        E03/40 tr_auc=0.6442 tr_loss=0.6618 | val_auc=0.8169 val_loss=0.6088 | 0s
+23:31:46  INFO          Checkpoint salvo (val AUC=0.8169)
+23:31:46  INFO        E04/40 tr_auc=0.6899 tr_loss=0.6380 | val_auc=0.8294 val_loss=0.5939 | 0s
+23:31:46  INFO          Checkpoint salvo (val AUC=0.8294)
+23:31:47  INFO        E05/40 tr_auc=0.7152 tr_loss=0.6184 | val_auc=0.8412 val_loss=0.5719 | 0s
+23:31:47  INFO          Checkpoint salvo (val AUC=0.8412)
+23:31:47  INFO        E06/40 tr_auc=0.7364 tr_loss=0.6008 | val_auc=0.8429 val_loss=0.5698 | 0s
+23:31:47  INFO          Checkpoint salvo (val AUC=0.8429)
+23:31:48  INFO        E07/40 tr_auc=0.7481 tr_loss=0.5929 | val_auc=0.8504 val_loss=0.5467 | 0s
+23:31:48  INFO          Checkpoint salvo (val AUC=0.8504)
+23:31:48  INFO        E08/40 tr_auc=0.7632 tr_loss=0.5770 | val_auc=0.8567 val_loss=0.5423 | 0s
+23:31:48  INFO          Checkpoint salvo (val AUC=0.8567)
+23:31:49  INFO        E09/40 tr_auc=0.7556 tr_loss=0.5862 | val_auc=0.8564 val_loss=0.5322 | 0s
+23:31:49  INFO        E10/40 tr_auc=0.7843 tr_loss=0.5608 | val_auc=0.8621 val_loss=0.5253 | 0s
+23:31:49  INFO          Checkpoint salvo (val AUC=0.8621)
+23:31:49  INFO        E11/40 tr_auc=0.7698 tr_loss=0.5681 | val_auc=0.8645 val_loss=0.5063 | 0s
+23:31:49  INFO          Checkpoint salvo (val AUC=0.8645)
+23:31:50  INFO        E12/40 tr_auc=0.7845 tr_loss=0.5604 | val_auc=0.8659 val_loss=0.5031 | 0s
+23:31:50  INFO          Checkpoint salvo (val AUC=0.8659)
+23:31:50  INFO        E13/40 tr_auc=0.7938 tr_loss=0.5497 | val_auc=0.8689 val_loss=0.5006 | 0s
+23:31:50  INFO          Checkpoint salvo (val AUC=0.8689)
+23:31:51  INFO        E14/40 tr_auc=0.7957 tr_loss=0.5446 | val_auc=0.8709 val_loss=0.4867 | 0s
+23:31:51  INFO          Checkpoint salvo (val AUC=0.8709)
+23:31:51  INFO        E15/40 tr_auc=0.7928 tr_loss=0.5501 | val_auc=0.8708 val_loss=0.4817 | 0s
+23:31:52  INFO        E16/40 tr_auc=0.8059 tr_loss=0.5379 | val_auc=0.8722 val_loss=0.4711 | 0s
+23:31:52  INFO          Checkpoint salvo (val AUC=0.8722)
+23:31:52  INFO        E17/40 tr_auc=0.8047 tr_loss=0.5347 | val_auc=0.8745 val_loss=0.4731 | 0s
+23:31:52  INFO          Checkpoint salvo (val AUC=0.8745)
+23:31:52  INFO        E18/40 tr_auc=0.8079 tr_loss=0.5287 | val_auc=0.8756 val_loss=0.4796 | 0s
+23:31:52  INFO          Checkpoint salvo (val AUC=0.8756)
+23:31:53  INFO        E19/40 tr_auc=0.8069 tr_loss=0.5253 | val_auc=0.8782 val_loss=0.4692 | 0s
+23:31:53  INFO          Checkpoint salvo (val AUC=0.8782)
+23:31:53  INFO        E20/40 tr_auc=0.8081 tr_loss=0.5362 | val_auc=0.8778 val_loss=0.4682 | 0s
+23:31:54  INFO        E21/40 tr_auc=0.8232 tr_loss=0.5085 | val_auc=0.8789 val_loss=0.4540 | 0s
+23:31:54  INFO          Checkpoint salvo (val AUC=0.8789)
+23:31:54  INFO        E22/40 tr_auc=0.8166 tr_loss=0.5169 | val_auc=0.8818 val_loss=0.4651 | 0s
+23:31:54  INFO          Checkpoint salvo (val AUC=0.8818)
+23:31:55  INFO        E23/40 tr_auc=0.8245 tr_loss=0.5054 | val_auc=0.8819 val_loss=0.4559 | 0s
+23:31:55  INFO          Checkpoint salvo (val AUC=0.8819)
+23:31:55  INFO        E24/40 tr_auc=0.8233 tr_loss=0.5129 | val_auc=0.8837 val_loss=0.4481 | 0s
+23:31:55  INFO          Checkpoint salvo (val AUC=0.8837)
+23:31:55  INFO        E25/40 tr_auc=0.8227 tr_loss=0.5175 | val_auc=0.8821 val_loss=0.4425 | 0s
+23:31:56  INFO        E26/40 tr_auc=0.8107 tr_loss=0.5258 | val_auc=0.8842 val_loss=0.4428 | 0s
+23:31:56  INFO          Checkpoint salvo (val AUC=0.8842)
+23:31:56  INFO        E27/40 tr_auc=0.8299 tr_loss=0.4983 | val_auc=0.8863 val_loss=0.4404 | 0s
+23:31:56  INFO          Checkpoint salvo (val AUC=0.8863)
+23:31:57  INFO        E28/40 tr_auc=0.8327 tr_loss=0.4973 | val_auc=0.8844 val_loss=0.4452 | 0s
+23:31:57  INFO        E29/40 tr_auc=0.8274 tr_loss=0.4959 | val_auc=0.8840 val_loss=0.4327 | 0s
+23:31:57  INFO        E30/40 tr_auc=0.8203 tr_loss=0.5086 | val_auc=0.8860 val_loss=0.4323 | 0s
+23:31:58  INFO        E31/40 tr_auc=0.8392 tr_loss=0.4912 | val_auc=0.8863 val_loss=0.4333 | 0s
+23:31:58  INFO        E32/40 tr_auc=0.8380 tr_loss=0.4850 | val_auc=0.8888 val_loss=0.4250 | 0s
+23:31:58  INFO          Checkpoint salvo (val AUC=0.8888)
+23:31:59  INFO        E33/40 tr_auc=0.8412 tr_loss=0.4879 | val_auc=0.8876 val_loss=0.4233 | 0s
+23:31:59  INFO        E34/40 tr_auc=0.8374 tr_loss=0.4856 | val_auc=0.8897 val_loss=0.4195 | 0s
+23:31:59  INFO          Checkpoint salvo (val AUC=0.8897)
+23:31:59  INFO        E35/40 tr_auc=0.8463 tr_loss=0.4800 | val_auc=0.8921 val_loss=0.4182 | 0s
+23:31:59  INFO          Checkpoint salvo (val AUC=0.8921)
+23:32:00  INFO        E36/40 tr_auc=0.8361 tr_loss=0.4916 | val_auc=0.8906 val_loss=0.4292 | 0s
+23:32:00  INFO        E37/40 tr_auc=0.8533 tr_loss=0.4636 | val_auc=0.8927 val_loss=0.4144 | 0s
+23:32:00  INFO          Checkpoint salvo (val AUC=0.8927)
+23:32:01  INFO        E38/40 tr_auc=0.8359 tr_loss=0.4907 | val_auc=0.8927 val_loss=0.4183 | 0s
+23:32:01  INFO          Checkpoint salvo (val AUC=0.8927)
+23:32:01  INFO        E39/40 tr_auc=0.8427 tr_loss=0.4859 | val_auc=0.8928 val_loss=0.4120 | 0s
+23:32:01  INFO          Checkpoint salvo (val AUC=0.8928)
+23:32:02  INFO        E40/40 tr_auc=0.8441 tr_loss=0.4767 | val_auc=0.8950 val_loss=0.4199 | 0s
+23:32:02  INFO          Checkpoint salvo (val AUC=0.8950)
+23:32:02  INFO        Melhor val AUC-ROC (fase MLP): 0.8950
+23:32:02  INFO      
+  AVALIACAO FINAL — test set canonico (mlp_only)
+23:32:02  INFO        AUC-ROC  : 0.8649
+23:32:02  INFO        Accuracy : 0.7337
+23:32:02  INFO        F1 macro : 0.7225
+23:32:02  INFO                    precision    recall  f1-score   support
+
+      NORMAL     0.5245    0.9145    0.6667       152
+     ANORMAL     0.9494    0.6595    0.7783       370
+
+    accuracy                         0.7337       522
+   macro avg     0.7370    0.7870    0.7225       522
+weighted avg     0.8257    0.7337    0.7458       522
+
+23:32:02  INFO        mlp_only concluido em 0.3 min | AUC=0.8649
+23:32:02  INFO      
+======================================================================
+23:32:02  INFO      
+=== COMPARAÇÃO FINAL ===
+23:32:02  INFO      Melhor modelo : cnn_only (AUC=0.9365)
+23:32:02  INFO      Pior modelo   : mlp_only (AUC=0.8649)
+23:32:02  INFO      Delta AUC     : 0.0716 (7.16%)
+23:32:02  INFO      Limiar H0     : < 2%
+23:32:02  INFO      CONCLUSÃO: H0 REJEITADA — existe diferença relevante de desempenho entre as arquiteturas avaliadas.
+23:32:02  INFO      
+Resultado final:
+                Modelo  AUC-ROC  Accuracy  F1 Macro  F1 Normal  F1 Anormal  Precisao Normal  Precisao Anormal  Recall Normal  Recall Anormal
+              cnn_only   0.9365    0.8755    0.8528     0.7950      0.9106           0.7636            0.9272         0.8289          0.8946
+       resnet50_hybrid   0.9293    0.8716    0.8513     0.7964      0.9063           0.7401            0.9391         0.8618          0.8757
+    densenet121_hybrid   0.9217    0.8352    0.8124     0.7471      0.8778           0.6755            0.9251         0.8355          0.8351
+efficientnet_b0_hybrid   0.9024    0.7874    0.7716     0.7117      0.8316           0.5880            0.9481         0.9013          0.7405
+              mlp_only   0.8649    0.7337    0.7225     0.6667      0.7783           0.5245            0.9494         0.9145          0.6595
+23:32:02  INFO      
+======================================================================
+23:32:02  INFO        SCRIPT 09 CONCLUIDO em 199.7 min
+23:32:02  INFO      ======================================================================
