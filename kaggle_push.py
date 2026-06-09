@@ -11,6 +11,7 @@ KERNEL_SLUG = os.getenv('KERNEL_SLUG')
 GITHUB_REPO = os.getenv('GITHUB_REPO')
 DATASET_CSV = os.getenv('KAGGLE_DATASET_CSV')
 DATASET_IMGS = os.getenv('KAGGLE_DATASET_IMGS')
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 
 notebook = {
     "metadata": {
@@ -29,32 +30,40 @@ notebook = {
             "metadata": {},
             "outputs": [],
             "source": [
-                "import subprocess, sys, os, shutil\n",
-                "from kaggle_secrets import UserSecretsClient\n",
+                "import subprocess, sys, os\n\n",
+
+                "subprocess.run(['pip', 'install', '-q',\n",
+                "    'torch==2.5.1', 'torchvision==0.20.1',\n",
+                "    '--index-url', 'https://download.pytorch.org/whl/cu124'\n",
+                "], check=True)\n",
+
+                "import IPython\n",
+                "IPython.Application.instance().kernel.do_shutdown(True)\n",
+
+                f"token = '{GITHUB_TOKEN}'\n",
+                f"repo  = '{GITHUB_REPO}'\n",
                 "\n",
-                "# clone único — antes de qualquer import\n",
                 "repo_path = '/kaggle/working/repo'\n",
-
-
-                "BRANCH = 'kaggle'\n",
-                "\n",
                 "if not os.path.exists(repo_path):\n",
                 "    subprocess.run([\n",
                 "        'git', 'clone', '--quiet', '--depth', '1',\n",
-                "        '--branch', BRANCH,\n",
                 "        f'https://{token}@{repo}',\n",
                 "        repo_path\n",
                 "    ], check=True)\n",
-                "    print(f'Clone OK (branch: {BRANCH})')\n",
+                "    print('Clone OK')\n",
                 "else:\n",
-                "    subprocess.run(['git', 'fetch', '--quiet'], cwd=repo_path, check=True)\n",
-                "    subprocess.run(['git', 'checkout', BRANCH], cwd=repo_path, check=True)\n",
-                "    subprocess.run(['git', 'pull', '--quiet'],  cwd=repo_path, check=True)\n",
-                "    print(f'Pull OK (branch: {BRANCH})')\n",
-
+                "    subprocess.run(['git', 'pull', '--quiet'], cwd=repo_path, check=True)\n",
+                "    print('Pull OK')\n",
+                "\n",
+                "for mod in list(sys.modules.keys()):\n",
+                "    if 'config' in mod or 'script_09' in mod:\n",
+                "        del sys.modules[mod]\n",
                 "\n",
                 "sys.path.insert(0, f'{repo_path}/src')\n",
                 "\n",
+                "os.environ['CUDA_LAUNCH_BLOCKING'] = '1'\n",
+                "os.environ['TORCH_USE_CUDA_DSA'] = '1'\n",
+
                 "from script_09_modelo_hibrido import main\n",
                 "main()\n",
             ]
@@ -72,8 +81,8 @@ metadata = {
     "language": "python",
     "kernel_type": "notebook",
     "is_private": True,
-    "enable_gpu": False,
-    "enable_tpu": True,
+    "enable_gpu": True,
+    "enable_tpu": False,
     "enable_internet": True,
     "dataset_sources": [DATASET_CSV, DATASET_IMGS],
     "kernel_sources": []
@@ -88,3 +97,4 @@ print(f"\nKernel submetido!")
 print(f"Status : kaggle kernels status {KAGGLE_USER}/{KERNEL_SLUG}")
 print(f"Logs   : kaggle kernels output {KAGGLE_USER}/{KERNEL_SLUG}")
 print(f"URL    : https://www.kaggle.com/code/{KAGGLE_USER}/{KERNEL_SLUG}")
+
