@@ -4,15 +4,15 @@
 Projeto     : PrediCuori
 Autor       : Leandro Dalla Nora
 Instituicao : UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação
-Data/Hora   : 01/06/2026 19:04:00
+Data/Hora   : 11/06/2026 13:41:32
 
 CONFIGURACAO DO DATASET
 ----------------------------------------
 Dataset         : True
-Imagens         : image_tracings
+Imagens         : /home/leandro/faculdade/PrediCuori/data/image_tracings
 N features      : 14
 Features        : HR, Pd, PR, QRS_Dur, QT, QTC, P_axis, QRS_axis, T_axis, RV5, SV1, RV5_SV1_sum, RV6, SV2
-Img resize      : 256x136 px (largura x altura) — aspect ratio 3385:1793 preservado
+Img resize      : 512x272 px (largura x altura) — aspect ratio 3385:1793 preservado
 Img channels    : 1 (Gray)
 Img modo orig.  : L (monocromatico, 300 DPI)
 Batch size      : 32
@@ -29,7 +29,7 @@ Seed            : 42
 RESULTADOS DE SANIDADE
 ----------------------------------------
 Dataset OK             : True
-Train loader (ms/batch): 0.0
+Train loader (ms/batch): 2.4
 Val   loader (ms/batch): 0.0
 Test  loader (ms/batch): -1000.0
 

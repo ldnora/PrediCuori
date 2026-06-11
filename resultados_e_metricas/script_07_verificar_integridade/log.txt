@@ -1,0 +1,76 @@
+================================================================================
+  SCRIPT 07: VERIFICAÇÃO DE INTEGRIDADE DAS IMAGENS ECG
+  UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação
+  PrediCuori
+  Autor  : Leandro Dalla Nora
+  Data   : 10/06/2026 21:09:07
+================================================================================
+================================================================================
+  AUDITORIA FÍSICA DO CORPUS DE IMAGENS
+================================================================================
+
+  Diretório         : data/image_tracings
+  Arquivos PNG encontrados : 3,900
+  Contagem esperada        : 3,900  [OK]
+  Resolução esperada       : 3385x1793 px
+  Modo esperado            : L (Gray/monocromático)
+
+  Progresso: 195/3,900 (5%) | Tempo: 23s | ETA: 434s
+  Progresso: 390/3,900 (10%) | Tempo: 49s | ETA: 443s
+  Progresso: 585/3,900 (15%) | Tempo: 88s | ETA: 498s
+  Progresso: 780/3,900 (20%) | Tempo: 119s | ETA: 474s
+  Progresso: 975/3,900 (25%) | Tempo: 143s | ETA: 429s
+  Progresso: 1,170/3,900 (30%) | Tempo: 166s | ETA: 388s
+  Progresso: 1,365/3,900 (35%) | Tempo: 189s | ETA: 351s
+  Progresso: 1,560/3,900 (40%) | Tempo: 215s | ETA: 323s
+  Progresso: 1,755/3,900 (45%) | Tempo: 241s | ETA: 294s
+  Progresso: 1,950/3,900 (50%) | Tempo: 263s | ETA: 263s
+  Progresso: 2,145/3,900 (55%) | Tempo: 293s | ETA: 240s
+  Progresso: 2,340/3,900 (60%) | Tempo: 324s | ETA: 216s
+  Progresso: 2,535/3,900 (65%) | Tempo: 353s | ETA: 190s
+  Progresso: 2,730/3,900 (70%) | Tempo: 384s | ETA: 164s
+  Progresso: 2,925/3,900 (75%) | Tempo: 414s | ETA: 138s
+  Progresso: 3,120/3,900 (80%) | Tempo: 444s | ETA: 111s
+  Progresso: 3,315/3,900 (85%) | Tempo: 470s | ETA: 83s
+  Progresso: 3,510/3,900 (90%) | Tempo: 495s | ETA: 55s
+  Progresso: 3,705/3,900 (95%) | Tempo: 519s | ETA: 27s
+  Progresso: 3,900/3,900 (100%) | Tempo: 546s | ETA: 0s
+
+  Auditoria concluída em 545.7s
+  Taxa: 7 imagens/segundo
+================================================================================
+  CRUZAMENTO DE COBERTURA COM OS DATASETS TABULARES
+================================================================================
+  [GOLD] CSV não encontrado: /data/csv/ecg_gold_completo_classified.csv
+  [SILVER_KNN] CSV não encontrado: /data/csv/ecg_silver_knn_imputado_classified.csv
+
+  Imagens sem registro tabular em nenhum dataset: 3,900
+  Exemplos: ['0001.png', '0002.png', '0003.png', '0004.png', '0005.png']
+================================================================================
+  RELATÓRIO DE INTEGRIDADE
+================================================================================
+
+  Diretório auditado : data/image_tracings
+  Data/hora          : 10/06/2026 21:18:13
+
+  RESUMO GERAL
+  Arquivos PNG no diretório               :    3,900
+  Contagem esperada                       :    3,900  [OK]
+  Imagens verificadas individualmente     :    3,900
+  Imagens OK (sem problemas)              :    3,900  (100.00%)
+
+  PROBLEMAS DETECTADOS
+  Arquivos corrompidos                    :      0
+  Resolução incorreta                     :      0
+  Modo de cor incorreto                   :      0
+  Brilho insuficiente                     :      0
+  Contraste insuficiente                  :      0
+  Arquivos muito grandes                  :      0
+
+  TOTAL DE IMAGENS COM PROBLEMAS          :      0  (0.00%)
+
+  TAXA DE INTEGRIDADE GERAL: 100.00%
+  STATUS: CORPUS ÍNTEGRO — Pronto para pipeline de Deep Learning
+================================================================================
+  EXPORTANDO ARTEFATOS
+================================================================================
