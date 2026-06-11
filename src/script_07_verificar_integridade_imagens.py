@@ -91,13 +91,13 @@ warnings.filterwarnings('ignore')
 
 CONFIG = {
     # Diretório físico de imagens — fonte primária da auditoria
-    'image_dir':   '../image_tracings',
-    'output_dir':  '../resultados_e_metricas/script_07_verificar_integridade/',
-    'plots_dir':   '../resultados_e_metricas/script_07_verificar_integridade/plots_comparativos/',
+    'image_dir':   'data/image_tracings',
+    'output_dir':  '/resultados_e_metricas/script_07_verificar_integridade/',
+    'plots_dir':   '/resultados_e_metricas/script_07_verificar_integridade/plots_comparativos/',
 
     # CSVs para cruzamento de cobertura (pós-auditoria)
     # O Bronze não será usado nesse contexto
-    'datasets_dir': '../csv',
+    'datasets_dir': '/data/csv',
     'csv_files': {
         'GOLD':         'ecg_gold_completo_classified.csv',
         'SILVER_KNN':   'ecg_silver_knn_imputado_classified.csv',

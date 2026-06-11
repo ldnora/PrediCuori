@@ -310,8 +310,7 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
         random_state=config['random_seed']
     )
 
-    gold_test_idx_silver = mapear_gold_para_silver(
-        gold_idx=gold_test_idx, config=config)
+    gold_test_idx_silver = mapear_gold_para_silver(gold_idx=gold_test_idx, config=config)
 
     mask = np.ones(len(dataset_silver), dtype=bool)
     mask[gold_test_idx_silver] = False
@@ -875,7 +874,7 @@ def main():
             f"\n  ERRO: Diretorio de imagens nao encontrado: {config['image_dir']}")
         return
 
-    print_secao("1. CARREGANDO DATASET BASE (SILVER)")
+    print_secao("1. CARREGANDO DATASET BASE")
     dataset_base = ECGMultimodalDataset(
         csv_file=config['datasets']['SILVER']['file'],
         image_dir=config['image_dir'],
