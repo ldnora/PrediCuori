@@ -1,104 +1,55 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Modelo Híbrido DenseNet121 + MLP
-#
-#
-# ## Objetivo do Script_09 no Escopo Silver KNN
-#
-# O script_09, em sua versão original, itera sobre os 5 datasets treinando um modelo por dataset. Na configuração
-# Silver KNN deste roteiro, o loop é simplificado para treinar apenas 1 modelo — o SILVER_KNN — avaliado no test
-# set canônico do GOLD. Isso reduz o tempo total de execução em aproximadamente 80%.
-# 5.3 Adaptação do CONFIG para Rodar Apenas Silver KNN
-#
-# ```python
-# # Em CONFIG['datasets'] (script_09_modelo_hibrido.py):
-# # Manter apenas o SILVER_KNN no dicionário:
-# 'datasets': {
-# 'GOLD' : {'file': '../csv/ecg_gold_completo_classified.csv',
-# 'n': 3013, 'imputacao_pct': 0.0, 'metodo': 'Sem imputacao'},
-# 'SILVER_KNN': {'file': '../csv/ecg_silver_knn_imputado_classified.csv',
-# 'n': 3481, 'imputacao_pct': 1.67, 'metodo': 'KNN'},
-# # Remover ou comentar BRONZE_HYBRID, BRONZE_MICE, BRONZE_KNN
-# },
-# # ATENÇÃO: GOLD deve permanecer no dicionário pois gerar_analise_comparativa()
-# # faz referência a todos_metricas['GOLD'] para calcular Delta_GOLD.
-# # Ou adapte a função para calcular delta em relação ao próprio SILVER_KNN.
-# ```
-#
-# > Alternativa simplificada:
-# >
-# > Se o objetivo é apenas treinar e avaliar o SILVER KNN sem comparação com GOLD, pode-se também remover o GOLD do dicionário e simplificar a função gerar_analise_comparativa() para não calcular Delta_GOLD. Nesse caso, os resultados serão apresentados apenas para o SILVER KNN.
-#
-#
-# ## Arquitetura do Modelo Híbrido
-#
-# A arquitetura HybridECGClassifier integra dois branches especializados fundidos por concatenação:
-#
-# | Componente | Input → Output                 | Descrição                                                                                                   |
-# | ---------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-# | Branch CNN | `[B, 1, 272, 512] → [B, 1024]` | DenseNet121 pré-treinado em ImageNet, com `conv0` adaptado para 1 canal usando a média dos pesos originais. |
-# | Branch MLP | `[B, 14] → [B, 32]`            | Rede densa composta por `Linear(14→64)` + `ReLU` + `Dropout(0.4)` + `Linear(64→32)`.                        |
-# | Fusão      | `[B, 1056] → [B, 2]`           | `CONCAT([1024, 32])` seguido de `FC(1056→256→128→2)` + `Dropout` + `Softmax`.                               |
-#
-#
-#
-#
-# ## Estratégia de Treinamento em 2 Fases
-#
-# ### Fase 1 — Warm-up (10 épocas, CNN congelada)
-#
-# - CNN (DenseNet121) completamente congelada — apenas MLP e camadas de fusão treinadas
-# - LR único: 1e-3 (otimizador Adam)
-# - Objetivo: inicializar os pesos da fusão sem destruir representações ImageNet da CNN
-#
-#
-# ### Fase 2 — Fine-tuning (40 épocas, rede completa)
-#
-# - Todos os parâmetros liberados para treinamento
-# - LRs diferenciados: CNN: 1e-5 | MLP: 1e-4 | Fusão: 1e-4
-# - ReduceLROnPlateau: fator 0.5, paciência 5 épocas no val_loss
-# - Early stopping: paciência 10 épocas no val_AUC
-# - Gradient clipping: grad_clip=1.0 para estabilidade numérica
-# - Class weights: calculados sobre y_train do SILVER KNN via compute_class_weight
-#
-#
-# ## Métricas de Avaliação
-#
-# O modelo é avaliado no test set canônico do GOLD (452 registros). As métricas calculadas são:
-# - AUC-ROC: principal métrica — meta >= 0,95
-# - Accuracy: acurácia geral no test set
-# - F1 Macro: média dos F1 de ambas as classes
-# - F1 NORMAL (classe 0) e F1 ANORMAL (classe 1): análise por classe
-# - Baseline de referência: XGBoost tabular puro — AUC = 0,928
-#
-#
-# ## Execução
-#
-# - Garantir que o test set canônico do GOLD está disponível
-# ```bash
-# ls splits/test_indices.npy # deve existir e conter 452 índices GOLD
-# ```
-#
-# > Tempo estimado: 30–90 minutos (CPU) | 10–25 minutos (GPU NVIDIA com CUDA). Com SILVER KNN e apenas
-# > 1 modelo (sem os 4 datasets adicionais), o tempo é reduzido ~80% em relação ao script original.
-#
-#
-# ## Artefatos Gerados
-#
-# | Artefato                     | Local                    | Conteúdo                                                                   |
-# | ---------------------------- | ------------------------ | -------------------------------------------------------------------------- |
-# | `modelo_SILVER_KNN_final.pt` | `checkpoints/`           | Pesos finais do modelo, métricas, configurações e scaler.                  |
-# | `historico_SILVER_KNN.json`  | `resultados_e_metricas/` | Histórico de treino contendo loss e AUC por época (warm-up + fine-tuning). |
-# | `comparative_results.csv`    | `resultados_e_metricas/` | Tabela comparativa com métricas do(s) dataset(s) treinado(s).              |
-# | `comparative_roc.png`        | `plots_comparativos/`    | Curva ROC do modelo SILVER KNN comparada ao baseline XGBoost.              |
-# | `comparative_auc_barras.png` | `plots_comparativos/`    | Gráfico de barras da AUC-ROC com linha de meta em `0.95`.                  |
-# | `script_09_MAIN_*.log`       | `resultados_e_metricas/` | Log completo de execução contendo timestamps e métricas por época.         |
-#
+"""
 
-# # Config
+# Modelos Multimodais
 
-# In[38]:
+
+# Objetivo
+
+Criar e treinar 5 modelos, sendo 3 multimodais (DenseNet121, ResNet50 e EfficientNet_B0), um só com imagem (CNN) e outro só tabular (MLP).
+
+
+# Arquitetura do Modelo Híbrido
+
+A arquitetura HybridECGClassifier integra dois branches especializados fundidos por concatenação:
+
+| Componente | Input → Output                 | Descrição                                                                                                   |
+| ---------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Branch CNN | `[B, 1, 272, 512] → [B, 1024]` | DenseNet121 pré-treinado em ImageNet, com `conv0` adaptado para 1 canal usando a média dos pesos originais. |
+| Branch MLP | `[B, 14] → [B, 32]`            | Rede densa composta por `Linear(14→64)` + `ReLU` + `Dropout(0.4)` + `Linear(64→32)`.                        |
+| Fusão      | `[B, 1056] → [B, 2]`           | `CONCAT([1024, 32])` seguido de `FC(1056→256→128→2)` + `Dropout` + `Softmax`.                               |
+
+
+# Estratégia de Treinamento em 2 Fases
+
+## Fase 1 — Warm-up (10 épocas, CNN congelada)
+
+- CNN (DenseNet121) completamente congelada — apenas MLP e camadas de fusão treinadas
+- LR único: 1e-3 (otimizador Adam)
+- Objetivo: inicializar os pesos da fusão sem destruir representações ImageNet da CNN
+
+
+## Fase 2 — Fine-tuning (40 épocas, rede completa)
+
+- Todos os parâmetros liberados para treinamento
+- LRs diferenciados: CNN: 1e-5 | MLP: 1e-4 | Fusão: 1e-4
+- ReduceLROnPlateau: fator 0.5, paciência 5 épocas no val_loss
+- Early stopping: paciência 10 épocas no val_AUC
+- Gradient clipping: grad_clip=1.0 para estabilidade numérica
+- Class weights: calculados sobre y_train do SILVER KNN via compute_class_weight
+
+
+# Métricas de Avaliação
+
+O modelo é avaliado no test set canônico do GOLD (452 registros). As métricas calculadas são:
+- AUC-ROC: principal métrica — meta >= 0,95
+- Accuracy: acurácia geral no test set
+- F1 Macro: média dos F1 de ambas as classes
+- F1 NORMAL (classe 0) e F1 ANORMAL (classe 1): análise por classe
+"""
+
 
 from device_utils import (get_device,
                           patch_config_for_device,
@@ -234,19 +185,15 @@ class HybridECGClassifier(nn.Module):
 
         # Branch MLP: 14 -> 128 -> 64 -> 32
         self.mlp_branch = nn.Sequential(
-            nn.Linear(n_tab, 128), nn.BatchNorm1d(128), nn.ReLU(
-                inplace=True), nn.Dropout(dropout),
-            nn.Linear(128, 64),   nn.BatchNorm1d(64),  nn.ReLU(
-                inplace=True), nn.Dropout(dropout),
-            nn.Linear(64, 32),    nn.BatchNorm1d(32),  nn.ReLU(inplace=True),
+            nn.Linear(n_tab, 128), nn.BatchNorm1d(128), nn.ReLU(inplace=True), nn.Dropout(dropout),
+            nn.Linear(128, 64), nn.BatchNorm1d(64), nn.ReLU(inplace=True), nn.Dropout(dropout),
+            nn.Linear(64, 32), nn.BatchNorm1d(32), nn.ReLU(inplace=True),
         )
 
         # Fusao: [1056] -> [256] -> [128] -> [2]
         self.fusion = nn.Sequential(
-            nn.Linear(
-                n_cnn + 32, 256), nn.BatchNorm1d(256), nn.ReLU(inplace=True), nn.Dropout(dropout),
-            nn.Linear(256, 128),        nn.BatchNorm1d(
-                128), nn.ReLU(inplace=True), nn.Dropout(dropout),
+            nn.Linear(n_cnn + 32, 256), nn.BatchNorm1d(256), nn.ReLU(inplace=True), nn.Dropout(dropout),
+            nn.Linear(256, 128), nn.BatchNorm1d(128), nn.ReLU(inplace=True), nn.Dropout(dropout),
             nn.Linear(128, config['n_classes']),
         )
 
@@ -685,9 +632,9 @@ def criar_modelo(model_name, config):
 
 
 def carregar_splits(splits_dir: str) -> dict:
-    train_path = os.path.join(splits_dir, 'train_path.npy')
-    val_path = os.path.join(splits_dir, 'val_path.npy')
-    gold_test_path = os.path.join(splits_dir, 'gold_test_path.npy')
+    train_path = os.path.join(splits_dir, 'train_indices.npy')
+    val_path = os.path.join(splits_dir, 'val_indices.npy')
+    gold_test_path = os.path.join(splits_dir, 'gold_test_indices.npy')
 
     for split_path in [train_path, val_path, gold_test_path]:
         if not os.path.exists(split_path):
@@ -990,20 +937,6 @@ def gerar_analise_comparativa(todos_metricas, config, logger):
     return df_comp
 
 
-def substituir_bn(module):
-    for name, child in module.named_children():
-        if isinstance(child, nn.BatchNorm2d):
-            num_channels = child.num_features
-            setattr(module, name, nn.GroupNorm(
-                num_groups=min(32, num_channels),
-                num_channels=num_channels
-            ))
-        else:
-            substituir_bn(child)
-
-
-
-
 # In[53]:
 
 def main():
@@ -1054,7 +987,6 @@ def main():
 
         model = criar_modelo(model_name=model_name, config=config)
 
-        # substituir_bn(model)
         model.to(device)
 
         teste_sanidade(model, train_loader, device, config, logger)

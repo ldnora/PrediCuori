@@ -1,120 +1,95 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Dataset PyTorch e DataLoaders Multimodais
-#
-#
-# ## Objetivo e Função no Pipeline
-#
-# O script_08_pytorch_dataset.ipynb implementa o ECGMultimodalDataset, a classe central que integra imagens e
-# parâmetros tabulares em um único objeto PyTorch Dataset. Além da classe Dataset, o script define os pipelines
-# de transforms (augmentação para treino, normalização para validação/teste), realiza os splits estratificados e valida
-# os DataLoaders com testes de sanidade.
-#
-#
-# ## Adaptação para Silver KNN
-# O script_08, em sua versão original, usa o dataset GOLD como base dos splits. Para usar o SILVER KNN, a
-# única alteração necessária é no campo dataset_file do CONFIG:
-#
-# ```python
-# # Alterar em CONFIG (script_08_pytorch_dataset.ipynb):
-# # VERSÃO ORIGINAL (GOLD — NÃO usar neste roteiro):
-# # 'dataset_file': '../csv/ecg_gold_completo_classified.csv',
-# # VERSÃO SILVER KNN (usar neste roteiro):
-# 'dataset_file': '../csv/ecg_silver_knn_imputado_classified.csv',
-# ```
-#
-# <br>
-#
-#
-# >   Por que o SILVER KNN como base dos splits?
-# >
-# >   Ao usar o SILVER KNN (3.481 registros) como base, o split de treino conterá mais exemplos do que o GOLD (3.013), aproveitando os registros com imputação KNN de baixa intensidade (1,67%). O testset canônico (452 registros do GOLD) é carregado pelo script_09 independentemente — o script_08 não precisa saber do test set do GOLD.
-#
-#
-#
-# ## Splits Estratificados com Silver KNN
-#
-#
-# | Split | Proporção | N aprox. | Uso |
-# | :--- | :---: | :---: | :--- |
-# | **Train** | 70% | ~2.437 registros | Treino do modelo + fit do `StandardScaler` |
-# | **Validation** | 15% | ~522 registros | Monitoramento de early stopping e ajuste de LR |
-# | **Test (interno)** | 15% | ~522 registros | Reserva — **NOT** usado no `script_09` desta configuração |
-# | **Test canônico (GOLD)** | — | 452 registros | Avaliação final no `script_09` (carregado de `test_indices.npy`) |
-#
-#
-# ## Pipeline de Transforms
-# O pipeline define dois conjuntos de transforms separados para treino e avaliação:
-#
-# ### Transforms de Treino (com augmentação conservadora)
-#
-# - Grayscale(1): garante modo L mesmo em exceções de formato
-# - Resize((272, 512)): redimensiona preservando aspect ratio real 3385:1793
-# - RandomAffine: translate=0.02, scale=(0.98, 1.02) — shift ±2% e zoom ±2%
-# - ColorJitter: brightness=0.1, contrast=0.1 — jitter suave de iluminação
-# - ToTensor(): converte para tensor [0, 1]
-# - Normalize(mean=[0.5], std=[0.5]): mapeia para faixa [-1, 1]
-#
-# >    Restrições de augmentação em ECG:
-# >    Flip horizontal/vertical e rotações aleatórias são PROIBIDOS em ECG. O eixo X representa tempo (morfologia temporal das ondas P, QRS, T) e o eixo Y representa amplitude (derivações fixas). Qualquer transformação geométrica não-sutil invalida o significado clínico da imagem.
-#
-#
-# ### Transforms de Avaliação (val/test — sem augmentação)
-#
-# - Grayscale(1) + Resize((272, 512)) + ToTensor() + Normalize(0.5, 0.5)
-# - Sem augmentação — avaliação determinística e reproduzível
-#
-#
-#
-# ## Normalização Tabular (StandardScaler)
-#
-# O StandardScaler é ajustado EXCLUSIVAMENTE nos dados de treino (fit apenas no train split) e aplicado por
-# transformação (transform) nos splits de validação e teste. Isso previne data leakage da distribuição de validação
-# para o fit do scaler.
-# As 14 features tabulares normalizadas são: HR, Pd, PR, QRS_Dur, QT, QTC, P_axis, QRS_axis, T_axis, RV5,
-# SV1, RV5_SV1_sum, RV6, SV2.
-#
-#
-# ## Execução
-#
-# Execute célula por célula ou todas de uma única vez.
-#
-#
-# ## Testes de Sanidade
-#
-# O script executa automaticamente 5 testes de sanidade antes de finalizar:
-#
-# 1. Tamanho do dataset: N total == N registros no CSV filtrado para SILVER_KNN
-# 2. Shape dos tensores de imagem: (1, 272, 512) — canal, altura, largura
-# 3. Range dos pixels pós-normalização: valores próximos ao intervalo [-1, 1]
-# 4. Throughput dos DataLoaders: mede ms/batch em train, val e test loaders
-# 5. Distribuição de classes: verifica balanceamento NORMAL vs. ANORMAL por split
-#
-#
-#
-# ## Artefatos Gerados
-# | Artefato | Local | Conteúdo |
-# | :--- | :--- | :--- |
-# | `train_indices.npy` | `splits/` | Índices de treino do SILVER KNN (array numpy) |
-# | `val_indices.npy` | `splits/` | Índices de validação do SILVER KNN |
-# | `test_indices.npy` | `splits/` | Índices de test interno do SILVER KNN (**NÃO** é o test canônico GOLD) |
-# | `dataloader_sanity_report.txt` | `resultados_e_metricas/` | Relatório de sanidade: splits, shapes, throughput |
-# | `dataset_sample_grid.png` | `plots_comparativos/` | Grade $4 \times 4$ de amostras com label NORMAL/ANORMAL |
-#
-#
-# <br>
-#
-# >    Atenção — test_indices.npy gerado pelo script_08 vs. test canônico GOLD:
-# >    O script_08 gera um test_indices.npy baseado no SILVER KNN. O script_09, porém, carrega o test
-# >    set CANÔNICO do GOLD (452 registros) para avaliação final. Portanto, o test_indices.npy do SILVER
-# >    KNN gerado aqui NÃO é usado diretamente na avaliação do script_09. O script_09 exige que o test
-# >    set canônico do GOLD (gerado anteriormente em uma execução do script_08 com GOLD) esteja
-# >    disponível em splits/test_indices.npy. Veja a primeira seção do script 09
-#
+"""
+Dataset PyTorch e DataLoaders Multimodais
 
-# In[1]:
+# Objetivo e Função no Pipeline
 
+O script_08_pytorch_dataset.py implementa o ECGMultimodalDataset, a classe central que integra imagens e
+parâmetros tabulares em um único objeto PyTorch Dataset. Além da classe Dataset, o script define os pipelines
+de transforms (augmentação para treino, normalização para validação/teste), realiza os splits estratificados e valida os DataLoaders com testes de sanidade.
+
+
+>   Por que o SILVER KNN como base dos splits?
+>
+>   Ao usar o SILVER KNN (3.481 registros) como base, o split de treino conterá mais exemplos do que o GOLD (3.013), aproveitando os registros com imputação KNN de baixa intensidade (1,67%). O testset canônico (452 registros do GOLD) é carregado pelo script_09 independentemente — o script_08 não precisa saber do test set do GOLD.
+
+
+
+# Splits Estratificados com Silver KNN e GOLD
+#
+#
+| Split | Proporção | N aprox. | Uso |
+| :--- | :---: | :---: | :--- |
+| **Train** | 70% | ~2.437 registros | Treino do modelo + fit do `StandardScaler` |
+| **Validation** | 15% | ~522 registros | Monitoramento de early stopping e ajuste de LR |
+| **Test canônico (GOLD)** | — | ~522 registros | Avaliação final no `script_09` (carregado de `test_indices.npy`) |
+
+
+# Pipeline de Transforms
+
+O pipeline define dois conjuntos de transforms separados para treino e avaliação:
+
+## Transforms de Treino (com augmentação conservadora)
+
+- Grayscale(1): garante modo L mesmo em exceções de formato
+- Resize((272, 512)): redimensiona preservando aspect ratio real 3385:1793
+- RandomAffine: translate=0.02, scale=(0.98, 1.02) — shift ±2% e zoom ±2%
+- ColorJitter: brightness=0.1, contrast=0.1 — jitter suave de iluminação
+- ToTensor(): converte para tensor [0, 1]
+- Normalize(mean=[0.5], std=[0.5]): mapeia para faixa [-1, 1]
+
+
+>    Restrições de augmentação em ECG:
+>    Flip horizontal/vertical e rotações aleatórias são PROIBIDOS em ECG. O eixo X representa tempo (morfologia temporal das ondas P, QRS, T) e o eixo Y representa amplitude (derivações fixas). Qualquer transformação geométrica não-sutil invalida o significado clínico da imagem.
+
+
+## Transforms de Avaliação (val/test — sem augmentação)
+
+- Grayscale(1) + Resize((272, 512)) + ToTensor() + Normalize(0.5, 0.5)
+- Sem augmentação — avaliação determinística e reproduzível
+
+# Normalização Tabular (StandardScaler)
+
+O StandardScaler é ajustado EXCLUSIVAMENTE nos dados de treino (fit apenas no train split) e aplicado por
+transformação (transform) nos splits de validação e teste. Isso previne data leakage da distribuição de validação para o fit do scaler.
+As 14 features tabulares normalizadas são: HR, Pd, PR, QRS_Dur, QT, QTC, P_axis, QRS_axis, T_axis, RV5,
+SV1, RV5_SV1_sum, RV6, SV2.
+
+
+#Testes de Sanidade
+
+O script executa automaticamente 5 testes de sanidade antes de finalizar:
+
+1. Tamanho do dataset: N total == N registros no CSV filtrado para SILVER_KNN
+2. Shape dos tensores de imagem: (1, 272, 512) — canal, altura, largura
+3. Range dos pixels pós-normalização: valores próximos ao intervalo [-1, 1]
+4. Throughput dos DataLoaders: mede ms/batch em train, val e test loaders
+5. Distribuição de classes: verifica balanceamento NORMAL vs. ANORMAL por split do SILVER e GOLD
+
+
+
+#Artefatos Gerados
+| Artefato | Local | Conteúdo |
+| :--- | :--- | :--- |
+| `train_indices.npy` | `splits/` | Índices de treino do SILVER KNN (array numpy) |
+| `val_indices.npy` | `splits/` | Índices de validação do SILVER KNN |
+| `gold_test_indices.npy` | `splits/` | Índices de test interno do SILVER KNN (**NÃO** é o test canônico GOLD) |
+| `dataloader_sanity_report.txt` | `resultados_e_metricas/` | Relatório de sanidade: splits, shapes, throughput |
+| `dataset_sample_grid.png` | `plots_comparativos/` | Grade $4 \times 4$ de amostras com label NORMAL/ANORMAL |
+#
+#
+<br>
+#
+>    Atenção — test_indices.npy gerado pelo script_08 vs. test canônico GOLD:
+>    O script_08 gera um test_indices.npy baseado no SILVER KNN. O script_09, porém, carrega o test
+>    set CANÔNICO do GOLD (452 registros) para avaliação final. Portanto, o test_indices.npy do SILVER
+>    KNN gerado aqui NÃO é usado diretamente na avaliação do script_09. O script_09 exige que o test
+>    set canônico do GOLD (gerado anteriormente em uma execução do script_08 com GOLD) esteja
+>    disponível em splits/test_indices.npy. Veja a primeira seção do script 09
+
+"""
 
 import matplotlib.pyplot as plt
 from device_utils import get_device, patch_config_for_device, optimizer_step, save_checkpoint
@@ -268,7 +243,7 @@ class ECGMultimodalDataset(Dataset):
         return {int(k): int(v) for k, v in zip(unique, counts)}
 
     def get_params_dataframe(self) -> dict:
-        return sefl.df[self.param_cols].copy()
+        return self.df[self.param_cols].copy()
 
 
 # # Splits estratificados
@@ -284,9 +259,10 @@ def criar_splits(dataset_silver: ECGMultimodalDataset, dataset_gold: ECGMultimod
 
     os.makedirs(config['splits_dir'], exist_ok=True)
 
-    train_path = os.path.join(config['splits_dir'], 'train_path.npy')
-    val_path = os.path.join(config['splits_dir'], 'val_path.npy')
-    gold_test_path = os.path.join(config['splits_dir'], 'gold_test_path.npy')
+    train_path = os.path.join(config['splits_dir'], 'train_indices.npy')
+    val_path = os.path.join(config['splits_dir'], 'val_indices.npy')
+    gold_test_indices = os.path.join(
+        config['splits_dir'], 'gold_test_indices.npy')
 
     if not force_recalculate and all(os.path.isfile(p) for p in [train_path, val_path, gold_test_path]):
         print('\tSplits encontrados. Carregando...')
