@@ -190,7 +190,7 @@ class HybridECGClassifier(nn.Module):
             nn.Linear(64, 32), nn.BatchNorm1d(32), nn.ReLU(inplace=True),
         )
 
-        # Fusao: [1056] -> [256] -> [128] -> [2]
+        # Fusao: [ ] -> [256] -> [128] -> [2]
         self.fusion = nn.Sequential(
             nn.Linear(n_cnn + 32, 256), nn.BatchNorm1d(256), nn.ReLU(inplace=True), nn.Dropout(dropout),
             nn.Linear(256, 128), nn.BatchNorm1d(128), nn.ReLU(inplace=True), nn.Dropout(dropout),
