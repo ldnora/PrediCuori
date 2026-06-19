@@ -12,3 +12,4 @@ torchvision==0.20.1
 ipynb
 python-dotenv
 kaggle
+optuna
