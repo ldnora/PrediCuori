@@ -64,7 +64,6 @@ SHARED = {
     'aug_contrast': 0.1,
     'train_ratio': 0.70,
     'val_ratio': 0.15,
-    'test_ratio': 0.173249253235977,
     'random_seed': 42,
     'author': 'Leandro Dalla Nora',
     'institution': 'UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação',
@@ -72,11 +71,49 @@ SHARED = {
 }
 
 
+def build_config_06() -> dict:
+    return {
+        **SHARED,
+        'output_dir': os.path.join(_PATHS['output_dir'], 'script_06_modelos_tabulares'),
+        'plots_dir': os.path.join(_PATHS['output_dir'], 'script_06_modelos_tabulares', 'plots_comparativos'),
+        'physiological_ranges': {
+            "HR": (25, 300),
+            "Pd": (40, 200),
+            "PR": (50, 400),
+            "QRS_Dur": (40, 250),
+            "QT": (200, 700),
+            "QTC": (250, 700),
+            "P_axis": (-90, 120),
+            "QRS_axis": (-180, 180),
+            "T_axis": (-180, 180),
+            "RV5": (0, 15),
+            "SV1": (0, 15),
+            "RV5_SV1_sum": (0, 25),
+            "RV6": (0, 15),
+            "SV2": (0, 15)
+        },
+        'test_ratio': 0.15,
+        'metric': "roc_auc",
+        'n_trials': 1,
+        'cv_folds': 2,
+    }
+
+
+# TODO
+def build_config_07() -> dict:
+    return {
+        **SHARED,
+        'output_dir': os.path.join(_PATHS['output_dir'], 'script_07_verificar_integridade'),
+        'plots_dir': os.path.join(_PATHS['output_dir'], 'script_07_verificar_integridade', 'plots_comparativos'),
+    }
+
+
 def build_config_08() -> dict:
     return {
         **SHARED,
         'output_dir': os.path.join(_PATHS['output_dir'], 'script_08_pytorch_dataset'),
         'plots_dir': os.path.join(_PATHS['output_dir'], 'script_08_pytorch_dataset', 'plots_comparativos'),
+        'test_ratio': 0.173249253235977,
         'num_workers': 4,
         'pin_memory': False,
         'persistent_workers': False,
@@ -88,6 +125,7 @@ def build_config_09() -> dict:
         **SHARED,
         'results_dir': os.path.join(_PATHS['output_dir'], 'script_09_modelo_hibrido'),
         'checkpoints_dir': os.path.join(_PATHS['output_dir'], 'script_09_modelo_hibrido', 'checkpoints'),
+        'test_ratio': 0.173249253235977,
         'cnn_features': 1024,
         'mlp_out': 32,
         'fusion_dim': 1056,
