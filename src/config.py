@@ -99,12 +99,23 @@ def build_config_06() -> dict:
     }
 
 
-# TODO
 def build_config_07() -> dict:
     return {
         **SHARED,
         'output_dir': os.path.join(_PATHS['output_dir'], 'script_07_verificar_integridade'),
         'plots_dir': os.path.join(_PATHS['output_dir'], 'script_07_verificar_integridade', 'plots_comparativos'),
+        'expected_total_files': 3900,
+        # Especificações confirmadas das imagens (amostra real verificada)
+        'expected_size': (3385, 1793),  # (largura, altura) em pixels
+        'expected_mode': 'L',           # modo Gray (monocromático)
+        'expected_dpi': (300, 300),    # resolução esperada
+        'min_width': 2000,          # largura mínima aceitável
+        'min_height': 1000,          # altura mínima aceitável
+        # Thresholds de qualidade (escala 0-255, modo L/grayscale)
+        'min_brightness': 100,       # brilho médio mínimo aceitável máximo aceitável (254 = quase branco puro)
+        'max_brightness': 254,
+        'min_contrast': 5,       # desvio padrão mínimo de intensidade
+        'max_file_size_mb': 10,       # tamanho máximo por arquivo em MB
     }
 
 

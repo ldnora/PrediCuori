@@ -65,9 +65,6 @@
 # - Cobertura SILVER_KNN: todos os 3.481 registros devem ter imagem correspondente
 # - Se houver imagens sem cobertura no SILVER_KNN, anotar os filenames ausentes
 
-# In[47]:
-
-
 import os
 import re
 import csv
@@ -83,57 +80,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
+from config import build_config_07
+
 warnings.filterwarnings('ignore')
-
-
-# In[48]:
-
-
-CONFIG = {
-    # Diretório físico de imagens — fonte primária da auditoria
-    'image_dir':   'data/image_tracings',
-    'output_dir':  '/resultados_e_metricas/script_07_verificar_integridade/',
-    'plots_dir':   '/resultados_e_metricas/script_07_verificar_integridade/plots_comparativos/',
-
-    # CSVs para cruzamento de cobertura (pós-auditoria)
-    # O Bronze não será usado nesse contexto
-    'datasets_dir': '/data/csv',
-    'csv_files': {
-        'GOLD':         'ecg_gold_completo_classified.csv',
-        'SILVER_KNN':   'ecg_silver_knn_imputado_classified.csv',
-        # 'BRONZE_HYBRID':'ecg_bronze_hybrid_imputado_classified.csv',
-        # 'BRONZE_MICE':  'ecg_bronze_mice_imputado_classified.csv',
-        # 'BRONZE_KNN':   'ecg_bronze_knn_imputado_classified.csv',
-    },
-    'filename_col': 'filename',
-
-    # Contagem esperada do corpus físico
-    'expected_total_files': 3900,
-
-    # Especificações confirmadas das imagens (amostra real verificada)
-    'expected_size': (3385, 1793),  # (largura, altura) em pixels
-    'expected_mode': 'L',           # modo Gray (monocromático)
-    'expected_dpi':  (300, 300),    # resolução esperada
-    'min_width':     2000,          # largura mínima aceitável
-    'min_height':    1000,          # altura mínima aceitável
-
-    # Thresholds de qualidade (escala 0-255, modo L/grayscale)
-    'min_brightness':    100,       # brilho médio mínimo aceitável
-    'max_brightness':    254,       # máximo aceitável (254 = quase branco puro)
-    'min_contrast':        5,       # desvio padrão mínimo de intensidade
-    'max_file_size_mb':   10,       # tamanho máximo por arquivo em MB
-
-    # Metadados
-    'author':         "Leandro Dalla Nora",
-    'institution':    'UFSM - Departamento de Computação Aplicada - Curso de Sistemas de Informação',
-    'project':        'PrediCuori'
-}
-
-
-# # Funções utilitárias
-
-# In[49]:
-
 
 def normalizar_nome_arquivo(filename: str) -> str:
     """
@@ -190,8 +139,6 @@ def print_secao(titulo: str):
 
 
 # # Auditoria física do diretório
-
-# In[50]:
 
 
 def contagem_de_arquivos(image_dir: str, config: dict) -> tuple[list[str], int, int]:
@@ -362,7 +309,6 @@ def auditar_corpus_fisico(image_dir: str, config: dict) -> dict:
 
 # # Cruzamento de cobertura com o CSVs
 
-# In[51]:
 
 
 def cruzar_cobertura_csv(resultado: dict, config: dict) -> dict:
@@ -378,16 +324,14 @@ def cruzar_cobertura_csv(resultado: dict, config: dict) -> dict:
     filenames_fisicos = set(r['filename'] for r in resultado['records'])
 
     cobertura = {}
-    datasets_dir = config['datasets_dir']
 
-    for nome, arquivo in config['csv_files'].items():
-        path = os.path.join(datasets_dir, arquivo)
-        if not os.path.exists(path):
-            print(f"  [{nome}] CSV não encontrado: {path}")
+    for nome, dataset in config['datasets'].items():
+        if not os.path.exists(dataset['file']):
+            print(f"  [{nome}] CSV não encontrado: {dataset['file']}")
             cobertura[nome] = {'total': 0, 'com_imagem': 0, 'sem_imagem': 0}
             continue
 
-        df = pd.read_csv(path)
+        df = pd.read_csv(dataset['file'])
         filenames_csv = set(
             normalizar_nome_arquivo(f) for f in df[config['filename_col']]
         )
@@ -404,10 +348,9 @@ def cruzar_cobertura_csv(resultado: dict, config: dict) -> dict:
 
     # Imagens sem registro tabular em nenhum dataset
     todos_filenames_csv = set()
-    for nome, arquivo in config['csv_files'].items():
-        path = os.path.join(datasets_dir, arquivo)
-        if os.path.exists(path):
-            df = pd.read_csv(path)
+    for _, dataset in config['datasets'].items():
+        if os.path.exists(dataset['file']):
+            df = pd.read_csv(dataset['file'])
             todos_filenames_csv |= set(
                 normalizar_nome_arquivo(f) for f in df[config['filename_col']]
             )
@@ -421,8 +364,6 @@ def cruzar_cobertura_csv(resultado: dict, config: dict) -> dict:
 
 
 # # Relatório e exportação
-
-# In[ ]:
 
 
 def imprimir_relatorio(resultado: dict, cobertura: dict, config: dict):
@@ -550,11 +491,6 @@ def exportar_summary(resultado: dict, cobertura: dict, config: dict):
     print(f"  Summary exportado       : {output_path}")
 
 
-# # Gráficos
-
-# In[53]:
-
-
 def gerar_visualizacoes(resultado: dict, config: dict):
     """Gera painel de 6 gráficos de qualidade do corpus."""
     os.makedirs(config['plots_dir'], exist_ok=True)
@@ -668,44 +604,43 @@ def gerar_visualizacoes(resultado: dict, config: dict):
     print(f"  Visualização exportada  : {output_path}")
 
 
-# In[54]:
-
-
 def main():
+
+    config = build_config_07()
     print_separador()
     print("  SCRIPT 07: VERIFICAÇÃO DE INTEGRIDADE DAS IMAGENS ECG")
-    print(f"  {CONFIG['institution']}")
-    print(f"  {CONFIG['project']}")
-    print(f"  Autor  : {CONFIG['author']}")
+    print(f"  {config['institution']}")
+    print(f"  {config['project']}")
+    print(f"  Autor  : {config['author']}")
     print(f"  Data   : {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
     print_separador()
 
-    if not os.path.exists(CONFIG['image_dir']):
-        print(f"\n  ERRO: Diretório de imagens não encontrado: {CONFIG['image_dir']}")
+    if not os.path.exists(config['image_dir']):
+        print(f"\n  ERRO: Diretório de imagens não encontrado: {config['image_dir']}")
         return
 
     # ------------------------------------------------------------------
     # 1. Auditoria física — itera sobre os 3.900 arquivos do diretório
     # ------------------------------------------------------------------
-    resultado = auditar_corpus_fisico(CONFIG['image_dir'], CONFIG)
+    resultado = auditar_corpus_fisico(config['image_dir'], config)
 
     # ------------------------------------------------------------------
     # 2. Cruzamento de cobertura com os 5 CSVs
     # ------------------------------------------------------------------
-    cobertura = cruzar_cobertura_csv(resultado, CONFIG)
+    cobertura = cruzar_cobertura_csv(resultado, config)
 
     # ------------------------------------------------------------------
     # 3. Relatório consolidado
     # ------------------------------------------------------------------
-    imprimir_relatorio(resultado, cobertura, CONFIG)
+    imprimir_relatorio(resultado, cobertura, config)
 
     # ------------------------------------------------------------------
     # 4. Exportar artefatos
     # ------------------------------------------------------------------
     print_secao("EXPORTANDO ARTEFATOS")
-    exportar_csv(resultado, CONFIG)
-    exportar_summary(resultado, cobertura, CONFIG)
-    gerar_visualizacoes(resultado, CONFIG)
+    exportar_csv(resultado, config)
+    exportar_summary(resultado, cobertura, config)
+    gerar_visualizacoes(resultado, config)
 
     print_separador()
     print("  SCRIPT 07 CONCLUÍDO COM SUCESSO")
