@@ -46,91 +46,18 @@ Criar um modelo multimodal, que integre as 12 derivações dos ECGs com os dados
 ├── kaggle_push.py
 ├── README.md
 ├── requirements.txt
-├── resultados_e_metricas
-│   ├── _20260416_153715
-│   │   ├── hyperparams.json
-│   │   ├── metrics.csv
-│   │   └── models
-│   │       ├── gradient_boosting.pkl
-│   │       ├── logistic_regression.pkl
-│   │       ├── mlp.pkl
-│   │       ├── random_forest.pkl
-│   │       ├── svm.pkl
-│   │       └── xgboost.pkl
-│   ├── outliers_stats.txt
-│   ├── plots_comparativos
-│   │   ├── baseline_comparison.png
-│   │   ├── bell_chart_prata.png
-│   │   ├── confusion_matrix_gradient_boosting.png
-│   │   ├── confusion_matrix_logistic_regression.png
-│   │   ├── confusion_matrix_mlp.png
-│   │   ├── confusion_matrix_random_forest.png
-│   │   ├── confusion_matrix_svm.png
-│   │   ├── confusion_matrix_xgboost.png
-│   │   ├── confusion_matrix_XGB.png
-│   │   ├── feature_importance_gradient_boosting.png
-│   │   ├── feature_importance_logistic_regression.png
-│   │   ├── feature_importance_random_forest.png
-│   │   ├── feature_importance_RF.png
-│   │   ├── feature_importance_xgboost.png
-│   │   ├── feature_importance_XGB.png
-│   │   ├── histogramas_sv2_rv6.png
-│   │   └── roc_curves_comparison.png
-│   ├── script_07_verificar_integridade
-│   │   ├── integrity_report.csv
-│   │   ├── integrity_summary.txt
-│   │   ├── log.txt
-│   │   └── plots_comparativos
-│   │       └── image_quality_stats.png
-│   ├── script_08_pytorch_dataset
-│   │   ├── dataloader_sanity_report.txt
-│   │   ├── log.txt
-│   │   └── plots_comparativos
-│   │       └── dataset_sample_grid.png
-│   └── script_09_modelo_hibrido
-│       ├── checkpoints
-│       │   ├── cnn_only
-│       │   │   ├── best_finetune.pt
-│       │   │   ├── best_warmup.pt
-│       │   │   └── modelo_cnn_only_final.pt
-│       │   ├── densenet121_hybrid
-│       │   │   ├── best_finetune.pt
-│       │   │   ├── best_warmup.pt
-│       │   │   └── modelo_densenet121_hybrid_final.pt
-│       │   ├── efficientnet_b0_hybrid
-│       │   │   ├── best_finetune.pt
-│       │   │   ├── best_warmup.pt
-│       │   │   └── modelo_efficientnet_b0_hybrid_final.pt
-│       │   ├── mlp_only
-│       │   │   ├── best_finetune.pt
-│       │   │   └── modelo_mlp_only_final.pt
-│       │   └── resnet50_hybrid
-│       │       ├── best_finetune.pt
-│       │       ├── best_warmup.pt
-│       │       └── modelo_resnet50_hybrid_final.pt
-│       ├── comparative_results.csv
-│       ├── comparative_results.json
-│       ├── historico_cnn_only.json
-│       ├── historico_densenet121_hybrid.json
-│       ├── historico_efficientnet_b0_hybrid.json
-│       ├── historico_mlp_only.json
-│       ├── historico_resnet50_hybrid.json
-│       ├── plots_comparativos
-│       │   ├── comparative_auc_barras.png
-│       │   └── comparative_roc.png
-│       ├── predicuori.log
-│       └── script_09_MAIN_20260608_201223.log
-└── src
-    ├── config.py
-    ├── device_utils.py
-    ├── script_06_baseline_tabular_v2.ipynb
-    ├── script_07_verificar_integridade_imagens.py
-    ├── script_08_pytorch_dataset.py
-    ├── script_09_modelo_hibrido.py
-    └── splits
-        ├── gold_test_indices.npy
-        ├── train_indices.npy
-        └── val_indices.npy
+├── resultados_e_metricas/
+├── src
+│   ├── config.py
+│   ├── device_utils.py
+│   ├── script_06_modelos_tabulares.py
+│   ├── script_07_verificar_integridade_imagens.py
+│   ├── script_08_pytorch_dataset.py
+│   ├── script_09_modelo_hibrido.py
+│   └── splits
+│       ├── gold_test_indices.npy
+│       ├── train_indices.npy
+│       └── val_indices.npy
 ```
 
 O arquivo `devbox.json` apresenta a configuração de sheel DevBox, a qual permite criar um ambiente sheel isolado.
@@ -147,7 +74,7 @@ O arquivo `src/config.py` apresenta um dicionário com a configuração usada em
 
 O arquivo `src/device_utils.py` detecta qual é o hardware que está sendo utilizado para executar o código. Ele é usado para o `src/script_09_modelo_hibrido.py`, pois este exige hardware mais potente.
 
-O arquivo `src/`
+O arquivo `src/script_06_modelos_tabulares.py` contém o código dos modelos tabulares.
 
 O script `src/script_07_verificar_integridade_imagens.py` é responsável por verificar a integridade das imagens.
 
@@ -162,6 +89,16 @@ O script `src/script_09_modelo_hibrido.py` contém os modelos multimodais utiliz
 "Hmm, achei muito interessante esse trabalho, mas como fazer os meus próprios experimentos?"
 
 Calma jovem, vou lhe explicar:
+
+#### Clone este repositório
+
+Clone o repositório usando HTTPS, SSH ou GitHub CLI:
+
+`git clone https://github.com/ldnora/PrediCuori.git`
+
+`git clone git@github.com:ldnora/PrediCuori.git`
+
+`gh repo clone ldnora/PrediCuori`
 
 
 #### Configuração do ambiente
@@ -187,12 +124,14 @@ Ative o ambiente virtual para o Gnu Linux/MacOS: `.venv\bin/activate`
 
 #### Instalação dos datasets
 
-TODO
+Atualmente, os datasets são privados. Serão públicos após a publicação deles em revistas.
 
 
 #### Execução
 
 Rode no terminal os comandos: 
+
+Script 06: `python src/script_06_modelos_tabulares.py`
 
 Scritp 07: `python src/script_07_verificar_integridade_imagens.py`
 
